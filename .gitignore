@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Data files that are auto-generated
+app/dados.json
+app/dados.js
+app/dados-clientes.json
+app/dados-clientes.js
+app/orcamento.json
+
+# Temporary files
+/tmp/
+*.tmp
