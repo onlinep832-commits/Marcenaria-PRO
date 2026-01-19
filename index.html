@@ -992,8 +992,8 @@
                     </p>
                     <div class="botoes-acao">
                         <button id="btnSalvarDadosJson" class="btn-success">Baixar Backup (dados.json)</button>
-                        <label id="labelImportarDados" class="btn btn-primary" style="cursor: pointer;">Importar (Carregar Backup)</label>
-                        <input type="file" id="importarDadosInput" accept=".json" style="display: none;" />
+                        <label id="labelImportarDadosDados" class="btn btn-primary" style="cursor: pointer;">Importar (Carregar Backup)</label>
+                        <input type="file" id="importarDadosInputDados" accept=".json" style="display: none;" />
                     </div>
                 </section>
             </div>
@@ -4222,7 +4222,7 @@
 
                 // Função para carregar dados.json via seletor de arquivo
                 const carregarDadosDoArquivo = () => {
-                    const inputFile = getEl("importarDadosInput");
+                    const inputFile = getEl("importarDadosInputDados");
                     const arquivo = inputFile.files[0];
                     
                     if (!arquivo) return;
@@ -4246,7 +4246,7 @@
                     inputFile.value = ""; // Limpa o input
                 };
                 
-                getEl("importarDadosInput").addEventListener("change", carregarDadosDoArquivo);
+                getEl("importarDadosInputDados").addEventListener("change", carregarDadosDoArquivo);
 
                 // Função para limpar localStorage (útil para começar do zero)
                 const limparLocalStorage = () => {
@@ -5522,5 +5522,4 @@
 
         </script>
     </body>
-</html>
 </html>
