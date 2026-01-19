@@ -5488,8 +5488,19 @@
             };
 
             window.verificarStatusDados = function() {
-                // Try to get AppData from window, localStorage, or DADOS_DO_SISTEMA
-                const appData = window.AppData || JSON.parse(localStorage.getItem("marcenaria_pro_AppData") || "null") || window.DADOS_DO_SISTEMA || {};
+                // Try to get AppData from window, localStorage, or DADOS_DO_SISTEMA with safe parsing
+                let appData = window.AppData;
+                
+                if (!appData) {
+                    try {
+                        appData = JSON.parse(localStorage.getItem("marcenaria_pro_AppData") || "null");
+                    } catch (e) {
+                        console.error("Error parsing AppData from localStorage:", e);
+                        appData = null;
+                    }
+                }
+                
+                appData = appData || window.DADOS_DO_SISTEMA || {};
                 
                 const status = {
                     "🔹 Módulos": appData.catalogoModulos?.length || 0,
