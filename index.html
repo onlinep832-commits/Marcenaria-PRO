@@ -992,8 +992,8 @@
                     </p>
                     <div class="botoes-acao">
                         <button id="btnSalvarDadosJson" class="btn-success">Baixar Backup (dados.json)</button>
-                        <label id="labelImportarDados" class="btn btn-primary" style="cursor: pointer;">Importar (Carregar Backup)</label>
-                        <input type="file" id="importarDadosInput" accept=".json" style="display: none;" />
+                        <label id="labelImportarDadosDados" class="btn btn-primary" style="cursor: pointer;">Importar (Carregar Backup)</label>
+                        <input type="file" id="importarDadosInputDados" accept=".json" style="display: none;" />
                     </div>
                 </section>
             </div>
@@ -1847,6 +1847,7 @@
                 
                 // --- ESTADO DA APLICAÇÃO ---
                 let AppData = {};
+                window.AppData = AppData; // Make AppData globally accessible
                 let projetoAtual = { modulos: [], ferragensExtras: [] };
                 let listaPecasGerada = [];
                 let listaFerragensGerada = [];
@@ -2390,6 +2391,7 @@
                     }
 
                     AppData = { ...defaults, ...dadosCarregados };
+                    window.AppData = AppData; // Update global reference
                     
                     // Salva no localStorage para garantir persistência futura
                     saveAppState(); 
@@ -4222,7 +4224,7 @@
 
                 // Função para carregar dados.json via seletor de arquivo
                 const carregarDadosDoArquivo = () => {
-                    const inputFile = getEl("importarDadosInput");
+                    const inputFile = getEl("importarDadosInputDados");
                     const arquivo = inputFile.files[0];
                     
                     if (!arquivo) return;
@@ -4232,6 +4234,7 @@
                         try {
                             const dadosNovos = JSON.parse(evento.target.result);
                             AppData = { ...AppData, ...dadosNovos };
+                            window.AppData = AppData; // Update global reference
                             saveAppState();
                             showToast("Dados carregados com sucesso do arquivo!", "success");
                             console.log("Dados carregados do arquivo:", dadosNovos);
@@ -4246,7 +4249,7 @@
                     inputFile.value = ""; // Limpa o input
                 };
                 
-                getEl("importarDadosInput").addEventListener("change", carregarDadosDoArquivo);
+                getEl("importarDadosInputDados").addEventListener("change", carregarDadosDoArquivo);
 
                 // Função para limpar localStorage (útil para começar do zero)
                 const limparLocalStorage = () => {
@@ -4665,6 +4668,7 @@
                             const importedData = JSON.parse(e.target.result);
                             if (importedData.catalogoModulos || importedData.coresMDF || importedData.catalogoFerragens) {
                                 AppData = importedData;
+                                window.AppData = AppData; // Update global reference
                                 saveAppState();
                                 showToast("Dados importados! A página será recarregada.", "success");
                                 setTimeout(() => window.location.reload(), 1500);
@@ -5484,13 +5488,27 @@
             };
 
             window.verificarStatusDados = function() {
+                // Try to get AppData from window, localStorage, or DADOS_DO_SISTEMA with safe parsing
+                let appData = window.AppData;
+                
+                if (!appData) {
+                    try {
+                        appData = JSON.parse(localStorage.getItem("marcenaria_pro_AppData") || "null");
+                    } catch (e) {
+                        console.error("Error parsing AppData from localStorage:", e);
+                        appData = null;
+                    }
+                }
+                
+                appData = appData || window.DADOS_DO_SISTEMA || {};
+                
                 const status = {
-                    "🔹 Módulos": AppData.catalogoModulos?.length || 0,
-                    "🔹 Cores MDF": Object.keys(AppData.coresMDF || {}).length,
-                    "🔹 Cores Borda": Object.keys(AppData.coresBorda || {}).length,
-                    "🔹 Ferragens": Object.keys(AppData.catalogoFerragens || {}).length,
-                    "🔹 Perfis": Object.keys(AppData.catalogoPerfis || {}).length,
-                    "🔹 Peças Pré-definidas": Object.keys(AppData.pecasPredefinidas || {}).length,
+                    "🔹 Módulos": appData.catalogoModulos?.length || 0,
+                    "🔹 Cores MDF": Object.keys(appData.coresMDF || {}).length,
+                    "🔹 Cores Borda": Object.keys(appData.coresBorda || {}).length,
+                    "🔹 Ferragens": Object.keys(appData.catalogoFerragens || {}).length,
+                    "🔹 Perfis": Object.keys(appData.catalogoPerfis || {}).length,
+                    "🔹 Peças Pré-definidas": Object.keys(appData.pecasPredefinidas || {}).length,
                     "🔹 LocalStorage AppData": localStorage.getItem("marcenaria_pro_AppData") ? "✅ Sim" : "❌ Não",
                     "🔹 LocalStorage Clientes": localStorage.getItem("marcenaria_pro_clientes") ? "✅ Sim" : "❌ Não",
                 };
@@ -5522,5 +5540,4 @@
 
         </script>
     </body>
-</html>
 </html>
