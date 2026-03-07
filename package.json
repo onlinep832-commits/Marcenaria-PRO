@@ -1,0 +1,58 @@
+{
+  "name": "marcenaria-pro",
+  "version": "1.0.0",
+  "description": "Sistema de Marcenaria",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . MarcenariaPRO --platform=win32 --arch=x64 --icon=icon.png --out=dist --overwrite"
+  },
+  "author": "Seu Nome",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-packager": "^17.1.2"
+  }
+}
+```
+
+### Passo 4: Criar o arquivo `main.js`
+Crie outro arquivo na mesma pasta chamado **`main.js`**. Esse é o arquivo que "liga" o programa.
+Cole este código dentro dele:
+
+```javascript
+const { app, BrowserWindow } = require('electron')
+const path = require('path')
+
+function createWindow () {
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    title: "Marcenaria PRO",
+    icon: path.join(__dirname, 'icon.png'), // Ícone da janela
+    autoHideMenuBar: true, // Esconde a barra de menu padrão (File, Edit...)
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  })
+
+  // Carrega seu arquivo HTML
+  win.loadFile('index.html')
+}
+
+app.whenReady().then(() => {
+  createWindow()
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow()
+    }
+  })
+})
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+})
