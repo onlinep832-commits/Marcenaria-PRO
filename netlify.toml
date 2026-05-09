@@ -1,0 +1,54 @@
+# ============================================================
+#  Marcenaria PRO — Configuração de deploy no Netlify
+# ============================================================
+
+[build]
+  # Pasta raiz = o próprio projeto (sem etapa de build)
+  publish = "."
+  command  = ""
+  ignore   = "exit 0"
+
+# Impede que o Netlify processe o package.json como app Node
+[build.environment]
+  NODE_ENV = "production"
+
+# ── Cabeçalhos de segurança para todas as páginas ─────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
+    Permissions-Policy     = "geolocation=(), microphone=(), camera=()"
+
+# ── Cache longo para assets estáticos ────────────────────
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ── Sem cache para as páginas HTML (sempre frescas) ───────
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/admin/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/login/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"

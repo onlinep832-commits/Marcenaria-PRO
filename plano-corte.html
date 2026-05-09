@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plano de Corte — Marcenaria PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --secondary: #1e293b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --bg: #f1f4f9;
+    --card: #ffffff;
+    --border: #dde3ee;
+    --text: #0f172a;
+    --text-soft: #475569;
+    --tape-color: #f97316;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ---- TITLEBAR ---- */
+#titlebar {
+    background: #141824;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    height: 42px;
+    gap: 12px;
+    border-bottom: 1px solid #0d0f17;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+#titlebar .t-icon { font-size: 18px; }
+#titlebar .t-title { font-size: 13px; font-weight: 700; color: #fff; }
+#titlebar .t-sub { font-size: 11px; color: #5a6480; }
+#titlebar .t-space { flex: 1; }
+#titlebar .t-actions { display: flex; gap: 8px; }
+
+/* ---- TOOLBAR ---- */
+#toolbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.tb-group { display: flex; flex-direction: column; gap: 3px; }
+.tb-group label { font-size: 10px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+.tb-group input, .tb-group select {
+    height: 28px;
+    padding: 0 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: inherit;
+    background: #f1f5f9;
+    color: var(--text);
+}
+.tb-group input:focus, .tb-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: #fff;
+}
+.tb-sep { width: 1px; background: var(--border); align-self: stretch; margin: 0 4px; }
+
+/* ---- BOTÕES ---- */
+button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 13px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+    font-family: inherit;
+    color: #fff;
+    height: 28px;
+    white-space: nowrap;
+    transition: filter 0.15s;
+}
+button:hover { filter: brightness(1.1); }
+button:active { filter: brightness(0.95); }
+.btn-primary  { background: var(--primary); }
+.btn-success  { background: var(--success); }
+.btn-danger   { background: var(--danger); }
+.btn-secondary { background: var(--secondary); }
+.btn-sm { padding: 3px 9px; font-size: 11px; height: 24px; }
+
+/* ---- LAYOUT PRINCIPAL ---- */
+#main {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+/* ---- CARD ---- */
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.card h2 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ---- TABELA PEÇAS ---- */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 5px; max-height: 280px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; background: #fff; font-size: 12px; }
+th {
+    background: #f0f4fa;
+    color: var(--text-soft);
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 7px 10px;
+    border-bottom: 2px solid var(--border);
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    white-space: nowrap;
+}
+td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #f0f2f6;
+    color: var(--text);
+    vertical-align: middle;
+}
+td input[type="text"], td input[type="number"], td select {
+    width: 100%;
+    padding: 3px 6px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 11px;
+    font-family: inherit;
+    background: #f8fafc;
+    color: var(--text);
+    height: 24px;
+}
+td input:focus, td select:focus { border-color: var(--primary); background: #fff; outline: none; }
+/* Remove setas do spinner em inputs numéricos da tabela */
+td input[type="number"]::-webkit-inner-spin-button,
+td input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+td input[type="number"] { -moz-appearance: textfield; text-align: center; }
+tbody tr:hover td { background: #f7f9fc; }
+tbody tr:last-child td { border-bottom: none; }
+.check-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 10px;
+    justify-items: start;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 600;
+    padding: 2px 4px;
+}
+.check-wrap label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+}
+.check-wrap label:hover { color: var(--primary); }
+input[type="checkbox"] { width: 13px; height: 13px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
+
+/* ---- GERENCIADOR DE CHAPAS ---- */
+.specs-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+}
+.specs-form .tb-group { flex-grow: 1; min-width: 140px; }
+.specs-form .tb-group input, .specs-form .tb-group select { width: 100%; }
+
+/* ---- MAPA DE CORTE ---- */
+.sheet-display {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+}
+.sheet-header {
+    padding: 15px 30px;
+    border-bottom: 4px solid var(--primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+}
+.sheet-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.sheet-sub { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
+.sheet-perc { font-size: 1.5rem; font-weight: 800; color: var(--success); }
+
+.canvas-wrap { padding: 40px; background: #f1f5f9; display: flex; justify-content: center; border-bottom: 1px solid var(--border); }
+.sheet-canvas {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border: 1px solid #94a3b8;
+    background-color: #e2e8f0;
+    background-image: repeating-linear-gradient(45deg, #cbd5e1, #cbd5e1 10px, #f1f5f9 10px, #f1f5f9 20px);
+}
+
+.piece {
+    position: absolute;
+    border: 1px solid #475569;
+    background: #fff;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 10;
+    border-radius: 1px;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.piece:hover { background: #fffbeb !important; z-index: 50; box-shadow: 0 0 0 2px var(--primary); }
+
+.dim-w {
+    position: absolute; top: 2px; left: 0;
+    width: 100%; text-align: center;
+    font-size: 13px; font-weight: 900; pointer-events: none;
+    color: #1e293b; z-index: 27; text-shadow: 0 0 4px #fff;
+}
+.dim-h {
+    position: absolute; top: 0; left: 0;
+    height: 100%; width: 20px;
+    display: flex; align-items: center; justify-content: center;
+    writing-mode: vertical-lr; transform: rotate(180deg);
+    font-size: 13px; font-weight: 800; pointer-events: none;
+    color: #1e293b; z-index: 27; text-shadow: 0 0 4px #fff;
+}
+.piece-label {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; z-index: 25; overflow: hidden;
+}
+.piece-desc {
+    font-size: 11px; font-weight: 700;
+    overflow: hidden; text-overflow: ellipsis;
+    color: #1e293b; background: rgba(255,255,255,0.55);
+    padding: 1px 4px; border-radius: 3px; max-width: 100%; white-space: nowrap;
+}
+.piece-dim {
+    font-size: 9px; font-weight: 600; color: #475569;
+    background: rgba(255,255,255,0.7); padding: 0 4px;
+    border-radius: 2px; white-space: nowrap; margin-top: 2px;
+}
+
+.tape { position: absolute; background: var(--tape-color); z-index: 20; }
+.t-top { top: 0; left: 0; width: 100%; height: 3px; }
+.t-btm { bottom: 0; left: 0; width: 100%; height: 3px; }
+.t-lft { top: 0; left: 0; width: 3px; height: 100%; }
+.t-rgt { top: 0; right: 0; width: 3px; height: 100%; }
+
+.cut-line-v { position: absolute; top: 0; width: 0; border-left: 2px dashed rgba(220,38,38,0.7); z-index: 5; pointer-events: none; }
+.cut-line-h { position: absolute; left: 0; height: 0; border-top: 2px dashed rgba(220,38,38,0.7); z-index: 5; pointer-events: none; }
+.cut-label-h { position:absolute; left:4px; top:-17px; font-size:9px; font-weight:800; color:#dc2626; background:rgba(255,255,255,0.95); padding:1px 5px; border-radius:2px; white-space:nowrap; z-index:35; border:1px solid rgba(220,38,38,0.35); pointer-events:none; }
+.cut-label-v { position:absolute; top:4px; left:3px; font-size:9px; font-weight:800; color:#dc2626; background:rgba(255,255,255,0.95); padding:1px 3px; border-radius:2px; white-space:nowrap; z-index:35; writing-mode:vertical-rl; transform:rotate(180deg); transform-origin:top left; border:1px solid rgba(220,38,38,0.35); pointer-events:none; }
+.start-label { position: absolute; top: 4px; left: 4px; font-size: 10px; font-weight: 700; color: rgba(0,0,0,0.4); z-index: 30; background: rgba(255,255,255,0.7); padding: 1px 5px; border-radius: 3px; }
+
+/* ---- LISTA DE PEÇAS DA CHAPA ---- */
+.cut-list-wrap { background: #fff; }
+.cut-list-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.cut-list-table th { background: #f1f5f9; color: var(--text-soft); padding: 7px 12px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--border); text-align: left; }
+.cut-list-table td { padding: 6px 12px; border-bottom: 1px solid #f0f2f6; }
+.cut-list-table tr:last-child td { border-bottom: none; }
+.cut-list-table tr:hover td { background: #f7f9fc; }
+.dim-hl { font-weight: 700; color: var(--primary); font-family: monospace; }
+.status-yes { background: #dcfce7; color: #166534; padding: 1px 6px; border-radius: 3px; font-size: 10.5px; font-weight: 700; }
+.tape-badge { display: inline-block; padding: 1px 5px; margin: 0 2px; border: 1px solid var(--border); background: #fff; color: var(--text); font-weight: 700; font-size: 10px; border-radius: 3px; }
+
+/* ---- MODAL GERENCIAR CHAPAS ---- */
+.modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(3px);
+    z-index: 1050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+.modal-overlay.active { display: flex; }
+.modal-content {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 20px 24px;
+    width: 100%;
+    max-width: 860px;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    animation: slideUp 0.2s ease;
+}
+@keyframes slideUp { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 16px; }
+.modal-header h2 { font-size: 14px; font-weight: 700; }
+.modal-close { background: none; border: none; font-size: 1.4rem; color: var(--text-soft); cursor: pointer; padding: 0 6px; height: auto; }
+.modal-close:hover { color: var(--danger); filter: none; }
+
+/* ---- TOAST ---- */
+#toast-box { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.toast { padding: 9px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.15); animation: toastIn 0.2s ease; max-width: 300px; }
+.toast.success { background: #16a34a; border-left: 3px solid #4ade80; }
+.toast.error   { background: #dc2626; border-left: 3px solid #f87171; }
+@keyframes toastIn { from { transform: translateX(16px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ---- PLACEHOLDER ---- */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-soft); }
+.empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state-svg { display:block; margin:0 auto 20px; filter: drop-shadow(0 4px 12px rgba(0,0,0,.13)); animation: esSway 3.2s ease-in-out infinite; }
+@keyframes esSway { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+
+/* ---- SOBRA BADGE (reaproveitamento automático) ---- */
+        .badge-sobra { background:#10b981; color:#fff; font-size:10px; font-weight:800; padding:2px 7px; border-radius:3px; vertical-align:middle; margin-left:6px; letter-spacing:.04em; }
+
+/* ---- OVERLAY ÁREA DE SOBRA NA CHAPA ---- */
+.sobra-overlay {
+    position: absolute;
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(16,185,129,0.18) 0px, rgba(16,185,129,0.18) 6px,
+        rgba(16,185,129,0.05) 6px, rgba(16,185,129,0.05) 12px
+    );
+    border: 2px dashed #10b981;
+    box-sizing: border-box;
+    z-index: 2;
+    pointer-events: none;
+}
+.sobra-overlay-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #10b981;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    letter-spacing: .04em;
+}
+
+/* ---- ETIQUETAS ---- */
+.etiq-modal-content { width: 92vw; max-width: 1100px; max-height: 88vh; display:flex; flex-direction:column; overflow:hidden; }
+.etiq-toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+.etiq-toolbar label { font-size:11px; font-weight:600; color:var(--text-soft); }
+.etiq-preview-wrap { overflow:auto; flex:1; min-height:0; padding:2px; }
+.etiq-grid { display:flex; flex-wrap:wrap; gap:10px; padding:6px; }
+.etiq-label { box-sizing:border-box; width:180px; min-height:110px; border:2px solid #000; border-radius:0; padding:7px 8px; display:flex; flex-direction:column; gap:3px; background:#fff; color:#111; font-family:"Inter",sans-serif; page-break-inside:avoid; break-inside:avoid; }
+.etiq-label .etiq-num  { font-size:10px; font-weight:700; color:#555; }
+.etiq-label .etiq-desc { font-size:13px; font-weight:800; line-height:1.2; word-break:break-word; }
+.etiq-label .etiq-mat  { font-size:10px; color:#444; margin-top:1px; }
+.etiq-label .etiq-dim  { font-size:14px; font-weight:900; color:#000; letter-spacing:0.5px; }
+.etiq-label .etiq-footer { display:flex; justify-content:space-between; align-items:flex-end; margin-top:auto; padding-top:4px; border-top:1px solid #ccc; }
+.etiq-label .etiq-cliente { font-size:9px; color:#666; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fitas-row { display:flex; gap:3px; flex-wrap:wrap; }
+.fita-badge { font-size:8px; font-weight:700; padding:1px 4px; border-radius:2px; border:1px solid #aaa; background:#eee; color:#555; }
+.fita-badge.on  { background:#16a34a; border-color:#16a34a; color:#fff; }
+.etiq-rot-badge { font-size:8px; background:#f59e0b; color:#fff; padding:1px 4px; border-radius:2px; font-weight:700; }
+.etiq-chapa-badge { font-size:8px; background:#3b82f6; color:#fff; padding:1px 5px; border-radius:2px; font-weight:700; }
+.etiq-label.cnc { border:2px solid #000; border-radius:0; background:#fff; padding:6px 8px; gap:2px; }
+.etiq-label.cnc .etiq-id-cnc { font-size:26px; font-weight:900; line-height:1; letter-spacing:-1px; color:#000; }
+.etiq-label.cnc .etiq-desc { font-size:11px; font-weight:700; }
+.etiq-label.cnc .etiq-dim  { font-size:12px; font-weight:900; font-family:monospace; }
+.etiq-label.cnc .etiq-mat  { font-size:9px; }
+.etiq-label.cnc .etiq-footer { border-top:1px dashed #000; }
+
+/* ---- IMPRESSÃO ---- */
+@media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    #titlebar, #toolbar, .no-print { display: none !important; }
+    @page { size: A4 landscape; margin: 5mm; }
+    #main { padding: 0; max-width: none; }
+    .card { box-shadow: none; border: none; padding: 0; }
+    .sheet-display { border: 2px solid #000; margin-bottom: 0; page-break-after: always; break-after: page; border-radius: 0; }
+    .sheet-header { background: #eee !important; border-bottom: 2px solid #000; }
+    .sheet-canvas { background-image: repeating-linear-gradient(45deg, #aaa, #aaa 5px, #fff 5px, #fff 10px) !important; border: 2px solid #000 !important; }
+    .canvas-wrap { display: block !important; padding: 4px !important; border-bottom: 2px solid #000; text-align:center; overflow:visible !important; }
+    .canvas-wrap > .sheet-canvas { transform: scale(var(--print-scale,1)); transform-origin: top center; display: inline-block; }
+    .cut-line-v { border-left: 1.5px solid #000 !important; }
+    .cut-line-h { border-top: 1.5px solid #000 !important; }
+    .cut-label-h { color:#000 !important; background:#fff !important; border:1px solid #666 !important; font-size:9px !important; }
+    .cut-label-v { color:#000 !important; background:#fff !important; border:1px solid #666 !important; font-size:9px !important; }
+    .piece { border: 1.5px solid #000 !important; background: #f5f5f5 !important; }
+    .piece-num { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background:#000 !important; color:#fff !important; font-size:13px !important; border-radius:3px; padding:0 5px; }
+    .dim-w, .dim-h { color: #000 !important; font-size: 15px !important; font-weight: 900; background: #fff !important; }
+    .piece-desc { color: #000 !important; font-size: 13px !important; font-weight:700 !important; }
+    .piece-dim { color: #000 !important; background: rgba(255,255,255,0.85) !important; font-size: 10px !important; font-weight:700 !important; }
+    .tape { background: #000 !important; }
+    .cut-list-table { font-size: 9pt; border: 2px solid #000; border-collapse: collapse; }
+    .cut-list-table th { background: #ccc !important; border: 1px solid #000; padding: 2px; }
+    .cut-list-table td { border: 1px solid #000; padding: 2px; }
+    .cut-list-table tr:nth-child(odd) td { background: #eee !important; }
+    .dim-hl { color: #000 !important; }
+    body.print-sem-lista .cut-list-wrap { display: none !important; }
+    /* Modo impressão etiquetas — classe no body */
+    body.print-etiq #main, body.print-etiq #toolbar, body.print-etiq #titlebar { display:none !important; }
+    body.print-etiq #modal-etiq { position:static !important; display:block !important; background:none !important; padding:0 !important; }
+    body.print-etiq .etiq-modal-content { max-height:none !important; box-shadow:none !important; border:none !important; padding:0 !important; }
+    body.print-etiq .etiq-toolbar, body.print-etiq .modal-header { display:none !important; }
+    body.print-etiq .etiq-preview-wrap { overflow:visible !important; }
+    body.print-etiq .etiq-label { border:2px solid #000 !important; background:#fff !important; color:#000 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body.print-etiq .fita-badge.on { background:#000 !important; color:#fff !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="toast-box"></div>
+
+<!-- TITLEBAR -->
+<div id="titlebar">
+    <span class="t-icon">✂️</span>
+    <span class="t-title">Plano de Corte</span>
+    <span class="t-sub">— Marcenaria PRO</span>
+    <div class="t-space"></div>
+    <div class="t-actions">
+        <button class="btn-primary" onclick="gerarPlano()">⚡ Gerar Plano</button>
+        <button class="btn-secondary" onclick="abrirEtiquetas()">🏷️ Etiquetas</button>
+        <button class="btn-secondary" onclick="abrirGerenciador()">⚙️ Configurar Chapas</button>
+        <div style="position:relative;display:inline-block">
+            <button class="btn-secondary" onclick="toggleMenuImprimir(event)">🖨️ Imprimir ▾</button>
+            <div id="menu-imprimir" style="display:none;position:absolute;right:0;top:110%;background:#fff;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;min-width:250px;overflow:hidden">
+                <!-- Plano Completo -->
+                <div style="padding:6px 16px 4px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em">Plano Completo</div>
+                <button onclick="imprimirPlano(true)" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 16px;text-align:left;background:none;border:none;border-bottom:1px solid #f1f5f9;cursor:pointer;font-size:13px;color:#0f172a">📋 Com lista de peças</button>
+                <button onclick="imprimirPlano(false)" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 16px;text-align:left;background:none;border:none;border-bottom:2px solid #e2e8f0;cursor:pointer;font-size:13px;color:#0f172a">🗺️ Só mapa de corte</button>
+                <!-- Por Material -->
+                <div style="padding:6px 16px 4px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em">Por Material</div>
+                <div id="menu-por-material" style="max-height:200px;overflow-y:auto"></div>
+                <div style="padding:8px 12px;border-top:1px solid #e2e8f0;display:flex;flex-direction:column;gap:5px">
+                    <button onclick="imprimirMateriaisSelecionados(true)"  style="width:100%;padding:7px 0;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">📋 Com lista de peças</button>
+                    <button onclick="imprimirMateriaisSelecionados(false)" style="width:100%;padding:7px 0;background:#475569;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">🗺️ Só mapa de corte</button>
+                </div>
+            </div>
+        </div>
+        <button class="btn-secondary" onclick="window.close()">✕ Fechar</button>
+    </div>
+</div>
+
+<!-- TOOLBAR: CLIENTE -->
+<div id="toolbar" class="no-print">
+    <div class="tb-group" style="flex-grow:1; max-width:300px">
+        <label>Cliente</label>
+        <input type="text" id="clientName" placeholder="Nome do Cliente" style="width:100%">
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-group">
+        <label>Algoritmo de Aproveitamento</label>
+        <select id="algoritmo" style="width:280px">
+            <option value="shelf" selected>🪚 Corte Reto (faixas, guilhotina)</option>
+            <option value="guillotine">🔀 Corte Cruzado (guilhotina BSSF)</option>
+            <option value="growing">🌳 Corte Livre (árvore binária)</option>
+            <option value="auto">🤖 Total — Melhor Aproveitamento</option>
+        </select>
+    </div>
+    <div class="tb-sep"></div>
+    <div style="font-size:11px;color:var(--text-soft);align-self:center;">
+        <span id="infoTotal"></span>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+    <!-- TABELA DE PEÇAS -->
+    <div class="card no-print">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+            <h2 style="margin:0">📋 Lista de Peças</h2>
+            <div style="display:flex;gap:6px;">
+                <button class="btn-secondary btn-sm" onclick="adicionarLinha()">+ Adicionar Linha</button>
+                <button class="btn-danger btn-sm" onclick="limparTudo()">🗑 Limpar</button>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table id="pecasTable">
+                <colgroup>
+                    <col style="width:36px">
+                    <col style="width:20%">
+                    <col>
+                    <col style="width:80px">
+                    <col style="width:80px">
+                    <col style="width:68px">
+                    <col style="width:70px">
+                    <col style="width:160px">
+                    <col style="width:44px">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Material</th>
+                        <th>Descrição</th>
+                        <th style="text-align:center">Comp.</th>
+                        <th style="text-align:center">Larg.</th>
+                        <th style="text-align:center">Qtd</th>
+                        <th style="text-align:center">Girar?</th>
+                        <th style="text-align:center">Fitas de Borda</th>
+                        <th style="text-align:center"></th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyPecas">
+                    <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-soft);">Carregando dados da listagem...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ÁREA DO MAPA DE CORTE -->
+    <div class="card" id="resultado-card">
+        <h2>📐 Mapa de Corte</h2>
+        <div id="visual-area">
+            <div class="empty-state">
+                <svg class="empty-state-svg" width="220" height="160" viewBox="0 0 220 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- chapa de madeira (fundo) -->
+                  <rect x="10" y="20" width="200" height="130" rx="6" fill="#d4a96a" stroke="#b07d3a" stroke-width="2"/>
+                  <!-- veio da madeira -->
+                  <path d="M10 45 Q60 40 110 47 Q160 54 210 48" stroke="#c49050" stroke-width="1.2" fill="none" opacity=".7"/>
+                  <path d="M10 70 Q55 65 110 72 Q165 79 210 73" stroke="#c49050" stroke-width="1.2" fill="none" opacity=".6"/>
+                  <path d="M10 100 Q50 95 110 102 Q170 109 210 103" stroke="#c49050" stroke-width="1.2" fill="none" opacity=".5"/>
+                  <!-- peça 1 (grande) -->
+                  <rect x="18" y="28" width="88" height="56" rx="3" fill="#f0c97a" stroke="#b07d3a" stroke-width="1.5"/>
+                  <text x="62" y="60" text-anchor="middle" font-size="9" fill="#7a4f1e" font-family="sans-serif" font-weight="600">800×550</text>
+                  <!-- peça 2 -->
+                  <rect x="114" y="28" width="88" height="38" rx="3" fill="#f0c97a" stroke="#b07d3a" stroke-width="1.5"/>
+                  <text x="158" y="51" text-anchor="middle" font-size="9" fill="#7a4f1e" font-family="sans-serif" font-weight="600">600×380</text>
+                  <!-- peça 3 -->
+                  <rect x="18" y="92" width="56" height="50" rx="3" fill="#f0c97a" stroke="#b07d3a" stroke-width="1.5"/>
+                  <text x="46" y="121" text-anchor="middle" font-size="9" fill="#7a4f1e" font-family="sans-serif" font-weight="600">400×350</text>
+                  <!-- peça 4 -->
+                  <rect x="82" y="92" width="72" height="34" rx="3" fill="#f0c97a" stroke="#b07d3a" stroke-width="1.5"/>
+                  <text x="118" y="113" text-anchor="middle" font-size="9" fill="#7a4f1e" font-family="sans-serif" font-weight="600">500×240</text>
+                  <!-- peça 5 (pequena) -->
+                  <rect x="162" y="74" width="50" height="70" rx="3" fill="#f0c97a" stroke="#b07d3a" stroke-width="1.5"/>
+                  <text x="187" y="113" text-anchor="middle" font-size="9" fill="#7a4f1e" font-family="sans-serif" font-weight="600">360×500</text>
+                  <!-- linhas de corte horizontais -->
+                  <line x1="10" y1="90" x2="152" y2="90" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 3" opacity=".8"/>
+                  <!-- linha de corte vertical -->
+                  <line x1="110" y1="20" x2="110" y2="90" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 3" opacity=".8"/>
+                  <line x1="78" y1="90" x2="78" y2="150" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 3" opacity=".8"/>
+                  <!-- sobra (verde) -->
+                  <rect x="82" y="128" width="72" height="22" rx="2" fill="rgba(16,185,129,.22)" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4 3"/>
+                  <!-- Serra / cursor -->
+                  <g transform="translate(155,142)">
+                    <rect x="0" y="-7" width="28" height="11" rx="3" fill="#475569" />
+                    <polygon points="28,-3 36,1 28,4" fill="#94a3b8"/>
+                    <rect x="4" y="-5" width="4" height="7" rx="1" fill="#f59e0b"/>
+                    <rect x="10" y="-5" width="4" height="7" rx="1" fill="#f59e0b"/>
+                    <rect x="16" y="-5" width="4" height="7" rx="1" fill="#f59e0b"/>
+                  </g>
+                </svg>
+                <p style="font-size:1.05rem;font-weight:600;margin-bottom:6px">Nenhum plano gerado ainda</p>
+                <p>Adicione as peças acima e clique em <b>⚡ Gerar Plano</b> para calcular o encaixe nas chapas.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL ETIQUETAS -->
+<div id="modal-etiq" class="modal-overlay" onclick="if(event.target===this)fecharEtiquetas()">
+    <div class="modal-content etiq-modal-content">
+        <div class="modal-header">
+            <h2>🏷️ Etiquetas de Peças</h2>
+            <button class="modal-close" onclick="fecharEtiquetas()">×</button>
+        </div>
+        <div class="etiq-toolbar">
+            <label>Formato:
+                <select id="etiq-modo" onchange="renderEtiquetas()" style="margin-left:6px">
+                    <option value="manual">📋 Manual (carpinteiro)</option>
+                    <option value="cnc">🤖 CNC (máquina)</option>
+                </select>
+            </label>
+            <label style="margin-left:12px">Tamanho:
+                <select id="etiq-tamanho" onchange="renderEtiquetas()" style="margin-left:6px">
+                    <option value="a4">A4 — grade (padrão)</option>
+                    <option value="60x40">60 × 40 mm</option>
+                    <option value="60x100" selected>60 × 100 mm</option>
+                    <option value="100x150">100 × 150 mm</option>
+                    <option value="custom">Personalizado…</option>
+                </select>
+            </label>
+            <span id="etiq-custom-fields" style="display:none;gap:4px;align-items:center">
+                <input type="number" id="etiq-cw" placeholder="Larg mm" value="60" style="width:70px">
+                <span style="font-size:11px">×</span>
+                <input type="number" id="etiq-ch" placeholder="Alt mm" value="100" style="width:70px">
+                <span style="font-size:10px;color:var(--text-soft)">mm</span>
+            </span>
+            <label style="margin-left:8px">Material:
+                <select id="etiq-material" onchange="renderEtiquetas()" style="margin-left:6px;min-width:140px">
+                    <option value="">— Todos —</option>
+                </select>
+            </label>
+            <label style="margin-left:8px">
+                <input type="checkbox" id="etiq-porpeca" onchange="renderEtiquetas()" checked>
+                Uma por peça (expandir qtd)
+            </label>
+            <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+                <span id="etiq-count" style="font-size:11px;color:var(--text-soft)"></span>
+                <button class="btn-secondary" onclick="imprimirEtiquetas()">🖨️ Imprimir Etiquetas</button>
+            </div>
+        </div>
+        <div class="etiq-preview-wrap">
+            <div id="etiq-preview"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL GERENCIAR CHAPAS -->
+<div id="modal-specs" class="modal-overlay" onclick="if(event.target===this)fecharGerenciador()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>⚙️ Configurar Dimensões por Material</h2>
+            <button class="modal-close" onclick="fecharGerenciador()">×</button>
+        </div>
+        <div class="specs-form">
+            <div class="tb-group" style="min-width:200px;flex-grow:1">
+                <label>Nome do Material</label>
+                <input type="text" id="newName" placeholder="Ex: MDF 18mm Branco TX">
+            </div>
+            <div class="tb-group"><label>Comp. (mm)</label><input type="number" id="newL" value="2750" style="width:90px"></div>
+            <div class="tb-group"><label>Larg. (mm)</label><input type="number" id="newW" value="1850" style="width:90px"></div>
+            <div class="tb-group"><label>Serra (mm)</label><input type="number" id="newKerf" value="3" style="width:70px"></div>
+            <div class="tb-group"><label>Refile (mm)</label><input type="number" id="newTrim" value="10" style="width:70px"></div>
+            <div class="tb-group">
+                <label>Rotação</label>
+                <select id="newRot" style="width:130px">
+                    <option value="false">Não (Grão Fixo)</option>
+                    <option value="true">Sim (Livre)</option>
+                </select>
+            </div>
+            <div class="tb-group">
+                <label>Cor (CSS)</label>
+                <input type="color" id="newColor" value="#d4dce8" style="width:50px;padding:2px;height:28px;cursor:pointer">
+            </div>
+            <button class="btn-success" onclick="addSpec()">+ Adicionar</button>
+        </div>
+        <div class="table-wrap" style="max-height:300px">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Material</th>
+                        <th style="text-align:center">Comp.</th>
+                        <th style="text-align:center">Larg.</th>
+                        <th style="text-align:center">Serra</th>
+                        <th style="text-align:center">Refile</th>
+                        <th style="text-align:center">Rotação</th>
+                        <th style="text-align:center">Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="specsBody"></tbody>
+            </table>
+        </div>
+        <p style="font-size:11px;color:var(--text-soft);margin-top:10px;">
+            💡 Materiais sem configuração usam padrão: 2750×1850mm, Serra 3mm, Refile 10mm.
+        </p>
+
+
+    </div>
+</div>
+
+<script>
+// =============================================================
+//  ESTADO
+// =============================================================
+const STORAGE_DATA   = "plano_corte_pecas";
+const STORAGE_SPECS  = "marcenaria_pro_corteSpecs";
+
+// HTML do estado vazio (reutilizado no limpar e calculando)
+const EMPTY_STATE_HTML = document.getElementById('visual-area').innerHTML;
+
+let pieces = [];
+let specs  = {};
+let sheets = [];
+
+// =============================================================
+//  TOAST
+// =============================================================
+function toast(msg, type = "success") {
+    const box = document.getElementById("toast-box");
+    const el  = document.createElement("div");
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    box.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+}
+
+// =============================================================
+//  SPECS (localStorage)
+// =============================================================
+function loadSpecs() {
+    const raw = localStorage.getItem(STORAGE_SPECS);
+    specs = raw ? JSON.parse(raw) : {};
+}
+function saveSpecs() {
+    localStorage.setItem(STORAGE_SPECS, JSON.stringify(specs));
+}
+function getSpec(mat) {
+    if (specs[mat]) return specs[mat];
+    const lower = mat.toLowerCase();
+    for (const k of Object.keys(specs)) {
+        if (lower.includes(k.toLowerCase()) || k.toLowerCase().includes(lower)) return specs[k];
+    }
+    return { L: 2750, W: 1850, kerf: 3, trim: 10, rot: false, color: "#d4dce8" };
+}
+
+function addSpec() {
+    const name  = document.getElementById("newName").value.trim();
+    const L     = parseInt(document.getElementById("newL").value) || 2750;
+    const W     = parseInt(document.getElementById("newW").value) || 1850;
+    const kerf  = parseInt(document.getElementById("newKerf").value) || 3;
+    const trim  = parseInt(document.getElementById("newTrim").value) || 10;
+    const rot   = document.getElementById("newRot").value === "true";
+    const color = document.getElementById("newColor").value;
+    if (!name) { toast("Digite o nome do material.", "error"); return; }
+    specs[name] = { L, W, kerf, trim, rot, color };
+    saveSpecs();
+    renderSpecs();
+    document.getElementById("newName").value = "";
+    toast(`"${name}" adicionado.`);
+}
+
+function deleteSpec(name) {
+    if (!confirm(`Excluir "${name}"?`)) return;
+    delete specs[name];
+    saveSpecs();
+    renderSpecs();
+}
+
+function renderSpecs() {
+    const tbody = document.getElementById("specsBody");
+    const keys  = Object.keys(specs).sort();
+    if (keys.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:14px;color:var(--text-soft)">Nenhum material configurado.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = keys.map(k => {
+        const s = specs[k];
+        return `<tr>
+            <td><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${s.color};border:1px solid #ccc;margin-right:6px;vertical-align:middle;"></span>${k}</td>
+            <td style="text-align:center">${s.L}</td>
+            <td style="text-align:center">${s.W}</td>
+            <td style="text-align:center">${s.kerf}</td>
+            <td style="text-align:center">${s.trim}</td>
+            <td style="text-align:center">${s.rot ? '<span class="status-yes">Livre</span>' : '<span style="color:var(--text-soft)">Fixo</span>'}</td>
+            <td style="text-align:center"><button class="btn-danger btn-sm" onclick="deleteSpec('${k.replace(/'/g,"\\'")}')">Excluir</button></td>
+        </tr>`;
+    }).join("");
+}
+
+function abrirGerenciador() { renderSpecs(); document.getElementById("modal-specs").classList.add("active"); }
+function fecharGerenciador() { document.getElementById("modal-specs").classList.remove("active"); }
+
+// =============================================================
+//  ETIQUETAS
+// =============================================================
+function abrirEtiquetas() {
+    if (pieces.length === 0) { toast("Nenhuma peça carregada.", "error"); return; }
+    // Popular filtro de materiais
+    const sel = document.getElementById("etiq-material");
+    if (sel) {
+        const mats = [...new Set(pieces.map(p => p.mat))].sort();
+        sel.innerHTML = '<option value="">— Todos —</option>' + mats.map(m => `<option value="${m}">${m}</option>`).join('');
+    }
+    renderEtiquetas();
+    document.getElementById("modal-etiq").classList.add("active");
+}
+function fecharEtiquetas() { document.getElementById("modal-etiq").classList.remove("active"); }
+
+function _etiqFitas(it) {
+    return [["L1",it.l1],["L2",it.l2],["W1",it.w1],["W2",it.w2]]
+        .map(([k,v]) => `<span class="fita-badge${v?" on":""}">${k}</span>`).join("");
+}
+
+function _labelManual(it, cliente) {
+    const rot   = it.rotated ? `<span class="etiq-rot-badge">↻ Girado</span>` : "";
+    const chapa = it.chapa !== "—" ? `<span class="etiq-chapa-badge">Chapa ${it.chapa}</span>` : "";
+    return `<div class="etiq-label">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="etiq-num">#${String(it.n).padStart(2,"0")}</span>
+            <span style="display:flex;gap:3px">${rot}${chapa}</span>
+        </div>
+        <div class="etiq-desc">${it.desc}</div>
+        <div class="etiq-mat">${it.mat}</div>
+        <div class="etiq-dim">${it.l} &times; ${it.w} mm</div>
+        <div class="etiq-footer">
+            <div class="fitas-row">${_etiqFitas(it)}</div>
+            <span class="etiq-cliente">${cliente}</span>
+        </div>
+    </div>`;
+}
+
+function _labelCNC(it, cliente) {
+    const rot    = it.rotated ? "↻" : "";
+    const chapa  = it.chapa !== "—" ? `CH.${it.chapa}` : "";
+    const fitasOn = [it.l1?"L1":"",it.l2?"L2":"",it.w1?"W1":"",it.w2?"W2":""].filter(Boolean).join(" ");
+    return `<div class="etiq-label cnc">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <span class="etiq-id-cnc">${String(it.n).padStart(3,"0")}</span>
+            <span style="font-size:9px;font-weight:700;text-align:right;line-height:1.4">${chapa}${chapa&&rot?"<br>":""}${rot}</span>
+        </div>
+        <div class="etiq-desc">${it.desc}</div>
+        <div class="etiq-dim">L:${it.l}  W:${it.w}</div>
+        <div class="etiq-mat">${it.mat}</div>
+        <div class="etiq-footer" style="margin-top:4px;padding-top:3px">
+            <span style="font-size:8px">${fitasOn ? "Fitas: "+fitasOn : "Sem fitas"}</span>
+            <span style="font-size:8px">${cliente}</span>
+        </div>
+    </div>`;
+}
+
+// Retorna {w, h} em mm e se é modo etiquetadora (uma por página)
+function _etiqTamanho() {
+    const val = (document.getElementById("etiq-tamanho")||{}).value || "a4";
+    if (val === "a4")     return { w:0,   h:0,   label:false };
+    if (val === "60x40")  return { w:60,  h:40,  label:true };
+    if (val === "60x100") return { w:100, h:60,  label:true };
+    if (val === "100x150")return { w:150, h:100, label:true };
+    if (val === "custom") {
+        const cw = parseFloat((document.getElementById("etiq-cw")||{}).value) || 60;
+        const ch = parseFloat((document.getElementById("etiq-ch")||{}).value) || 100;
+        return { w: cw, h: ch, label:true };
+    }
+    return { w:0, h:0, label:false };
+}
+
+function renderEtiquetas() {
+    const modo    = (document.getElementById("etiq-modo")     || {}).value   || "manual";
+    const porPeca = (document.getElementById("etiq-porpeca")  || {}).checked !== false;
+    const cliente = (document.getElementById("clientName")    || {}).value   || "";
+    const filtMat = (document.getElementById("etiq-material") || {}).value   || "";
+    const sz      = _etiqTamanho();
+
+    // Mostrar/ocultar campos personalizados
+    const cf = document.getElementById("etiq-custom-fields");
+    const tv = (document.getElementById("etiq-tamanho")||{}).value;
+    if (cf) cf.style.display = tv === "custom" ? "flex" : "none";
+
+    const container = document.getElementById("etiq-preview");
+    const items = [];
+    let num = 0;
+
+    if (sheets.length > 0) {
+        sheets.forEach((sh, si) => {
+            sh.items.forEach(it => {
+                if (filtMat && it.mat !== filtMat) return;
+                items.push({ n:++num, desc:it.desc, mat:it.mat,
+                    l:it.realL, w:it.realW,
+                    l1:it.l1, l2:it.l2, w1:it.w1, w2:it.w2,
+                    rotated:it.rotated, chapa:`${si+1}/${sheets.length}` });
+            });
+        });
+    } else {
+        pieces.forEach(p => {
+            if (filtMat && p.mat !== filtMat) return;
+            const count = porPeca ? (p.q || 1) : 1;
+            for (let i = 0; i < count; i++) {
+                items.push({ n:++num, desc:p.desc, mat:p.mat,
+                    l:p.l, w:p.w,
+                    l1:p.l1, l2:p.l2, w1:p.w1, w2:p.w2,
+                    rotated:false, chapa:"—" });
+            }
+        });
+    }
+
+    const fn = modo === "cnc" ? _labelCNC : _labelManual;
+    const MM2PX = 3.2; // px por mm no preview
+    let labelStyle = "";
+    if (sz.label) {
+        const pw = Math.round(sz.w * MM2PX), ph = Math.round(sz.h * MM2PX);
+        const dimPx   = Math.round(ph * 0.15);
+        const descPx  = Math.round(ph * 0.10);
+        const smallPx = Math.round(ph * 0.065);
+        const padV = Math.round(ph * 0.04), padH = Math.round(pw * 0.03);
+        labelStyle = `<style>
+            .etiq-label { width:${pw}px !important; min-height:${ph}px !important; max-height:${ph}px !important; overflow:hidden; padding:${padV}px ${padH}px !important; gap:${Math.round(ph*0.02)}px !important; }
+            .etiq-label .etiq-dim  { font-size:${dimPx}px !important; }
+            .etiq-label .etiq-desc { font-size:${descPx}px !important; }
+            .etiq-label .etiq-num, .etiq-label .etiq-mat, .etiq-label .etiq-cliente, .etiq-label .fita-badge, .etiq-label .etiq-rot-badge, .etiq-label .etiq-chapa-badge { font-size:${smallPx}px !important; }
+        </style>`;
+    } else {
+        labelStyle = `<style>.etiq-label { width:180px !important; min-height:110px !important; max-height:none !important; }</style>`;
+    }
+    container.innerHTML = labelStyle + `<div class="etiq-grid">${items.map(it => fn(it, cliente)).join("")}</div>`;
+    const el = document.getElementById("etiq-count");
+    if (el) el.textContent = `${items.length} etiqueta(s)${sz.label ? ` · ${sz.w}×${sz.h}mm` : " · A4"}`;
+}
+
+function toggleMenuImprimir(e) {
+    e.stopPropagation();
+    const m = document.getElementById('menu-imprimir');
+    const isOpen = m.style.display !== 'none';
+    m.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) _atualizarMenuMaterial();
+    document.addEventListener('click', function fechar(){ m.style.display='none'; document.removeEventListener('click',fechar); });
+}
+
+function _atualizarMenuMaterial() {
+    const wrap = document.getElementById('menu-por-material');
+    if (!wrap) return;
+    const mats = [...new Set(sheets.map(s => s.mat))];
+    if (mats.length === 0) {
+        wrap.innerHTML = '<div style="padding:8px 16px;font-size:12px;color:#94a3b8">Gere o plano primeiro.</div>';
+        return;
+    }
+    const corMat = mat => {
+        const sp = specs[mat] || {};
+        return sp.color || '#d4dce8';
+    };
+    wrap.innerHTML = mats.map((mat, i) => {
+        const cor = corMat(mat);
+        const id = `chk-mat-${i}`;
+        const matEsc = mat.replace(/"/g, '&quot;');
+        return `<label onclick="event.stopPropagation()" for="${id}"
+            style="display:flex;align-items:center;gap:8px;padding:7px 16px;border-bottom:1px solid #f1f5f9;cursor:pointer;font-size:12px;color:#0f172a;user-select:none">
+            <input type="checkbox" id="${id}" data-mat="${matEsc}" checked
+                style="width:14px;height:14px;accent-color:#2563eb;cursor:pointer;flex-shrink:0">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${cor};border:1px solid #ccc;flex-shrink:0"></span>
+            ${mat}
+        </label>`;
+    }).join('');
+}
+
+function imprimirPlano(comLista) {
+    document.getElementById('menu-imprimir').style.display = 'none';
+    if (!comLista) document.body.classList.add('print-sem-lista');
+    window.print();
+    setTimeout(() => document.body.classList.remove('print-sem-lista'), 500);
+}
+
+function imprimirMateriaisSelecionados(comLista) {
+    document.getElementById('menu-imprimir').style.display = 'none';
+    const checks = document.querySelectorAll('#menu-por-material input[type=checkbox]:checked');
+    const mats = [...checks].map(c => c.dataset.mat);
+    if (mats.length === 0) { toast('Selecione ao menos um material.', 'warn'); return; }
+    const chapasSel = sheets.filter(s => mats.includes(s.mat));
+    if (chapasSel.length === 0) { toast('Nenhuma chapa encontrada.', 'error'); return; }
+    const vw = 900;
+    const htmlChapas = chapasSel.map(s => renderSheet(s, vw)).join('');
+    const listaStyle = comLista ? '' : '.cut-list-wrap{display:none!important}';
+    const win = window.open('', '_blank', 'width=1000,height=700');
+    if (!win) { toast('Popup bloqueado. Libere pop-ups.', 'error'); return; }
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+    <title>Materiais selecionados</title>
+    <style>*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box;margin:0;padding:0}@page{size:A4 landscape;margin:5mm}body{font-family:Inter,sans-serif;font-size:12px;background:#fff}:root{--primary:#2563eb;--success:#10b981;--danger:#ef4444;--border:#dde3ee;--text:#0f172a;--text-soft:#475569;--tape-color:#f97316}.sheet-display{border:2px solid #000;margin-bottom:8px;page-break-after:always;break-after:page;border-radius:0}.sheet-header{padding:8px 14px;border-bottom:3px solid #000;display:flex;justify-content:space-between;align-items:center;background:#eee}.sheet-title{font-size:13px;font-weight:700}.sheet-sub{font-size:11px;color:#475569;margin-top:2px}.sheet-perc{font-size:1.3rem;font-weight:800;color:#000}.canvas-wrap{padding:4px;background:#e8ecf3;text-align:center;border-bottom:2px solid #000;overflow:visible}.canvas-wrap>.sheet-canvas{transform:scale(var(--print-scale,1));transform-origin:top center;display:inline-block}.sheet-canvas{position:relative;overflow:hidden;border:2px solid #000;background-image:repeating-linear-gradient(45deg,#aaa,#aaa 5px,#fff 5px,#fff 10px)}.piece{position:absolute;border:1.5px solid #000;background:#f5f5f5;overflow:hidden;box-sizing:border-box;z-index:10;border-radius:1px}.dim-w{position:absolute;top:2px;left:0;width:100%;text-align:center;font-size:13px;font-weight:900;pointer-events:none;color:#000;z-index:27;text-shadow:0 0 3px #fff}.dim-h{position:absolute;top:0;left:0;height:100%;width:20px;display:flex;align-items:center;justify-content:center;writing-mode:vertical-lr;transform:rotate(180deg);font-size:13px;font-weight:800;pointer-events:none;color:#000;z-index:27;text-shadow:0 0 3px #fff}.piece-label{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:25;overflow:hidden}.piece-desc{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#000;background:rgba(255,255,255,.5);padding:1px 4px;border-radius:3px;max-width:100%}.piece-num{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#000!important;color:#fff!important;font-size:12px;font-weight:900;border-radius:3px;padding:0 4px;margin-right:3px;display:inline-block;vertical-align:middle}.tape{position:absolute;background:#000;z-index:20}.t-top{top:0;left:0;width:100%;height:2px}.t-btm{bottom:0;left:0;width:100%;height:2px}.t-lft{top:0;left:0;width:2px;height:100%}.t-rgt{top:0;right:0;width:2px;height:100%}.cut-line-v{position:absolute;width:0;border-left:1.5px solid #000;z-index:5;pointer-events:none}.cut-line-h{position:absolute;height:0;border-top:1.5px solid #000;z-index:5;pointer-events:none}.cut-label-h{position:absolute;left:4px;top:-16px;font-size:9px;font-weight:900;color:#000;background:#fff;padding:1px 5px;border-radius:2px;white-space:nowrap;border:1px solid #666;pointer-events:none}.cut-label-v{position:absolute;top:4px;left:3px;font-size:9px;font-weight:900;color:#000;background:#fff;padding:1px 3px;border-radius:2px;white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg);transform-origin:top left;border:1px solid #666;pointer-events:none}.start-label{position:absolute;top:3px;left:3px;font-size:9px;font-weight:700;color:rgba(0,0,0,.4);z-index:30;background:rgba(255,255,255,.7);padding:1px 4px;border-radius:2px}.sobra-overlay{position:absolute;background:repeating-linear-gradient(-45deg,rgba(16,185,129,.18) 0,rgba(16,185,129,.18) 6px,rgba(16,185,129,.05) 6px,rgba(16,185,129,.05) 12px);border:2px dashed #10b981;box-sizing:border-box;z-index:2;pointer-events:none}.sobra-overlay-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#10b981;color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:3px;white-space:nowrap}.badge-sobra{background:#10b981;color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:3px;margin-left:6px}.cut-list-wrap{background:#fff}.cut-list-table{width:100%;border-collapse:collapse;font-size:11px}.cut-list-table th{background:#ccc;color:#000;padding:4px 8px;font-size:10px;font-weight:700;text-transform:uppercase;border:1px solid #000;text-align:left}.cut-list-table td{padding:3px 8px;border:1px solid #000;color:#000}.cut-list-table tr:nth-child(odd) td{background:#eee}.dim-hl{font-weight:700;font-family:monospace}.status-yes{background:#dcfce7;color:#166534;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700}.tape-badge{display:inline-block;padding:1px 4px;margin:0 1px;border:1px solid #999;background:#fff;color:#333;font-weight:700;font-size:9px;border-radius:2px}${listaStyle}</style></head><body>
+    ${htmlChapas}
+    <script>window.onload=function(){window.print();setTimeout(()=>window.close(),1000)}<\/script>
+    </body></html>`);
+    win.document.close();
+}
+
+function imprimirPorMaterial(mat, comLista) {
+    document.getElementById('menu-imprimir').style.display = 'none';
+    const chapasMat = sheets.filter(s => s.mat === mat);
+    if (chapasMat.length === 0) { toast(`Nenhuma chapa de "${mat}".`, 'error'); return; }
+
+    const vw = 900;
+    const htmlChapas = chapasMat.map(s => renderSheet(s, vw)).join('');
+    const listaStyle = comLista ? '' : '.cut-list-wrap{display:none!important}';
+
+    const win = window.open('', '_blank', 'width=1000,height=700');
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+    <title>${mat}</title>
+    <style>*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box;margin:0;padding:0}@page{size:A4 landscape;margin:5mm}body{font-family:Inter,sans-serif;font-size:12px;background:#fff}:root{--primary:#2563eb;--success:#10b981;--danger:#ef4444;--border:#dde3ee;--text:#0f172a;--text-soft:#475569;--tape-color:#f97316}.sheet-display{border:2px solid #000;margin-bottom:8px;page-break-after:always;break-after:page;border-radius:0}.sheet-header{padding:8px 14px;border-bottom:3px solid #000;display:flex;justify-content:space-between;align-items:center;background:#eee}.sheet-title{font-size:13px;font-weight:700}.sheet-sub{font-size:11px;color:#475569;margin-top:2px}.sheet-perc{font-size:1.3rem;font-weight:800;color:#000}.canvas-wrap{padding:4px;background:#e8ecf3;text-align:center;border-bottom:2px solid #000;overflow:visible}.canvas-wrap>.sheet-canvas{transform:scale(var(--print-scale,1));transform-origin:top center;display:inline-block}.sheet-canvas{position:relative;overflow:hidden;border:2px solid #000;background-image:repeating-linear-gradient(45deg,#aaa,#aaa 5px,#fff 5px,#fff 10px)}.piece{position:absolute;border:1.5px solid #000;background:#f5f5f5;overflow:hidden;box-sizing:border-box;z-index:10;border-radius:1px}.dim-w{position:absolute;top:2px;left:0;width:100%;text-align:center;font-size:13px;font-weight:900;pointer-events:none;color:#000;z-index:27;text-shadow:0 0 3px #fff}.dim-h{position:absolute;top:0;left:0;height:100%;width:20px;display:flex;align-items:center;justify-content:center;writing-mode:vertical-lr;transform:rotate(180deg);font-size:13px;font-weight:800;pointer-events:none;color:#000;z-index:27;text-shadow:0 0 3px #fff}.piece-label{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:25;overflow:hidden}.piece-desc{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#000;background:rgba(255,255,255,.5);padding:1px 4px;border-radius:3px;max-width:100%}.piece-num{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#000!important;color:#fff!important;font-size:12px;font-weight:900;border-radius:3px;padding:0 4px;margin-right:3px;display:inline-block;vertical-align:middle}.tape{position:absolute;background:#000;z-index:20}.t-top{top:0;left:0;width:100%;height:2px}.t-btm{bottom:0;left:0;width:100%;height:2px}.t-lft{top:0;left:0;width:2px;height:100%}.t-rgt{top:0;right:0;width:2px;height:100%}.cut-line-v{position:absolute;width:0;border-left:1.5px solid #000;z-index:5;pointer-events:none}.cut-line-h{position:absolute;height:0;border-top:1.5px solid #000;z-index:5;pointer-events:none}.cut-label-h{position:absolute;left:4px;top:-16px;font-size:9px;font-weight:900;color:#000;background:#fff;padding:1px 5px;border-radius:2px;white-space:nowrap;border:1px solid #666;pointer-events:none}.cut-label-v{position:absolute;top:4px;left:3px;font-size:9px;font-weight:900;color:#000;background:#fff;padding:1px 3px;border-radius:2px;white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg);transform-origin:top left;border:1px solid #666;pointer-events:none}.start-label{position:absolute;top:3px;left:3px;font-size:9px;font-weight:700;color:rgba(0,0,0,.4);z-index:30;background:rgba(255,255,255,.7);padding:1px 4px;border-radius:2px}.sobra-overlay{position:absolute;background:repeating-linear-gradient(-45deg,rgba(16,185,129,.18) 0,rgba(16,185,129,.18) 6px,rgba(16,185,129,.05) 6px,rgba(16,185,129,.05) 12px);border:2px dashed #10b981;box-sizing:border-box;z-index:2;pointer-events:none}.sobra-overlay-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#10b981;color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:3px;white-space:nowrap}.badge-sobra{background:#10b981;color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:3px;margin-left:6px}.cut-list-wrap{background:#fff}.cut-list-table{width:100%;border-collapse:collapse;font-size:11px}.cut-list-table th{background:#ccc;color:#000;padding:4px 8px;font-size:10px;font-weight:700;text-transform:uppercase;border:1px solid #000;text-align:left}.cut-list-table td{padding:3px 8px;border:1px solid #000;color:#000}.cut-list-table tr:nth-child(odd) td{background:#eee}.dim-hl{font-weight:700;font-family:monospace}.status-yes{background:#dcfce7;color:#166534;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700}.tape-badge{display:inline-block;padding:1px 4px;margin:0 1px;border:1px solid #999;background:#fff;color:#333;font-weight:700;font-size:9px;border-radius:2px}${listaStyle}</style></head><body>
+    ${htmlChapas}
+    <script>window.onload=function(){window.print();setTimeout(()=>window.close(),1000)}<\/script>
+    </body></html>`);
+    win.document.close();
+}
+
+function imprimirEtiquetas() {
+    const sz      = _etiqTamanho();
+    const modo    = (document.getElementById("etiq-modo") || {}).value || "manual";
+    const porPeca = (document.getElementById("etiq-porpeca") || {}).checked !== false;
+    const cliente = (document.getElementById("clientName") || {}).value || "";
+    const filtMat = (document.getElementById("etiq-material") || {}).value || "";
+
+    // Monta lista de itens (com filtro de material)
+    const items = [];
+    let num = 0;
+    if (sheets.length > 0) {
+        sheets.forEach((sh, si) => {
+            sh.items.forEach(it => {
+                if (filtMat && it.mat !== filtMat) return;
+                items.push({ n:++num, desc:it.desc, mat:it.mat,
+                    l:it.realL, w:it.realW,
+                    l1:it.l1, l2:it.l2, w1:it.w1, w2:it.w2,
+                    rotated:it.rotated, chapa:`${si+1}/${sheets.length}` });
+            });
+        });
+    } else {
+        pieces.forEach(p => {
+            if (filtMat && p.mat !== filtMat) return;
+            const count = porPeca ? (p.q || 1) : 1;
+            for (let i = 0; i < count; i++) {
+                items.push({ n:++num, desc:p.desc, mat:p.mat,
+                    l:p.l, w:p.w,
+                    l1:p.l1, l2:p.l2, w1:p.w1, w2:p.w2,
+                    rotated:false, chapa:"—" });
+            }
+        });
+    }
+
+    const fn = modo === "cnc" ? _labelCNC : _labelManual;
+    const labelsHtml = items.map(it => fn(it, cliente)).join("");
+
+    // Define CSS conforme tamanho
+    let pageCSS, labelCSS;
+    if (sz.label) {
+        const W = sz.w, H = sz.h;
+        pageCSS  = `@page { size: ${W}mm ${H}mm; margin: 0; }`;
+        labelCSS = `
+            body { margin:0; padding:0; background:#fff; }
+            .etiq-label {
+                box-sizing: border-box;
+                width: ${W}mm;
+                height: ${H}mm;
+                border: 2px solid #000;
+                padding: ${(H*0.04).toFixed(1)}mm ${(W*0.04).toFixed(1)}mm;
+                display: flex;
+                flex-direction: column;
+                gap: ${(H*0.015).toFixed(1)}mm;
+                overflow: hidden;
+                page-break-after: always;
+                break-after: page;
+                font-family: "Inter", Arial, sans-serif;
+                background: #fff;
+                color: #000;
+            }
+            .etiq-num    { font-size: ${(H*0.07).toFixed(1)}mm; font-weight:700; color:#555; }
+            .etiq-desc   { font-size: ${(H*0.10).toFixed(1)}mm; font-weight:800; line-height:1.2; word-break:break-word; }
+            .etiq-mat    { font-size: ${(H*0.065).toFixed(1)}mm; color:#444; }
+            .etiq-dim    { font-size: ${(H*0.13).toFixed(1)}mm; font-weight:900; color:#000; letter-spacing:0.3px; margin-top:auto; }
+            .etiq-footer { display:flex; justify-content:space-between; align-items:flex-end; padding-top:${(H*0.02).toFixed(1)}mm; border-top:1px solid #ccc; margin-top:auto; }
+            .etiq-cliente{ font-size:${(H*0.055).toFixed(1)}mm; color:#666; }
+            .fitas-row   { display:flex; gap:${(W*0.01).toFixed(1)}mm; flex-wrap:wrap; }
+            .fita-badge  { font-size:${(H*0.055).toFixed(1)}mm; font-weight:700; padding:0.5mm 1mm; border:1px solid #aaa; background:#eee; color:#555; }
+            .fita-badge.on { background:#000; color:#fff; border-color:#000; }
+            .etiq-rot-badge  { font-size:${(H*0.05).toFixed(1)}mm; background:#f59e0b; color:#fff; padding:0.5mm 1mm; font-weight:700; }
+            .etiq-chapa-badge{ font-size:${(H*0.05).toFixed(1)}mm; background:#3b82f6; color:#fff; padding:0.5mm 1.5mm; font-weight:700; }
+            /* CNC */
+            .etiq-id-cnc { font-size:${(H*0.25).toFixed(1)}mm; font-weight:900; line-height:1; color:#000; }
+        `;
+    } else {
+        pageCSS  = `@page { size: A4 portrait; margin: 10mm; }`;
+        labelCSS = `
+            body { margin:0; padding:0; font-family:"Inter",Arial,sans-serif; }
+            .etiq-grid { display:flex; flex-wrap:wrap; gap:6mm; }
+            .etiq-label { box-sizing:border-box; width:55mm; min-height:35mm; border:2px solid #000; padding:3mm 3mm; display:flex; flex-direction:column; gap:1mm; page-break-inside:avoid; break-inside:avoid; background:#fff; color:#000; }
+            .etiq-num   { font-size:2.8mm; font-weight:700; color:#555; }
+            .etiq-desc  { font-size:3.5mm; font-weight:800; line-height:1.2; word-break:break-word; }
+            .etiq-mat   { font-size:2.5mm; color:#444; }
+            .etiq-dim   { font-size:4.5mm; font-weight:900; color:#000; margin-top:auto; }
+            .etiq-footer{ display:flex; justify-content:space-between; align-items:flex-end; padding-top:1mm; border-top:1px solid #ccc; margin-top:auto; }
+            .etiq-cliente{ font-size:2mm; color:#666; }
+            .fitas-row  { display:flex; gap:0.8mm; flex-wrap:wrap; }
+            .fita-badge { font-size:2mm; font-weight:700; padding:0.3mm 0.8mm; border:1px solid #aaa; background:#eee; color:#555; }
+            .fita-badge.on { background:#000; color:#fff; border-color:#000; }
+            .etiq-rot-badge  { font-size:1.8mm; background:#f59e0b; color:#fff; padding:0.3mm 0.8mm; font-weight:700; }
+            .etiq-chapa-badge{ font-size:1.8mm; background:#3b82f6; color:#fff; padding:0.3mm 1mm; font-weight:700; }
+            .etiq-id-cnc{ font-size:9mm; font-weight:900; line-height:1; color:#000; }
+        `;
+    }
+
+    // Abre janela limpa para impressão
+    const win = window.open("", "_blank", "width=800,height=600");
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+        <title>Etiquetas</title>
+        <style>
+            * { -webkit-print-color-adjust:exact; print-color-adjust:exact; box-sizing:border-box; }
+            ${pageCSS}
+            ${labelCSS}
+        </style>
+    </head><body>
+        ${sz.label
+            ? labelsHtml
+            : `<div class="etiq-grid">${labelsHtml}</div>`
+        }
+        <script>window.onload=function(){ window.print(); setTimeout(()=>window.close(),800); }<\/script>
+    </body></html>`);
+    win.document.close();
+
+}
+
+// =============================================================
+//  PEÇAS (carrega do localStorage enviado pelo sistema)
+// =============================================================
+function loadPieces() {
+    const raw = localStorage.getItem(STORAGE_DATA);
+    if (!raw) { toast("Nenhum dado recebido do sistema.", "error"); return; }
+    try {
+        pieces = JSON.parse(raw).map(p => ({
+            ...p,
+            // normaliza campo de quantidade (qty → q)
+            q: p.q ?? p.qty ?? 1,
+            // se veio sem rot definido, herda do spec do material
+            rot: p.rot !== undefined ? p.rot : (getSpec(p.mat).rot ?? true)
+        }));
+        const cliente = localStorage.getItem("plano_corte_cliente") || "";
+        document.getElementById("clientName").value = cliente;
+        renderTable();
+        const total = pieces.reduce((s, p) => s + p.q, 0);
+        document.getElementById("infoTotal").textContent = `${pieces.length} tipos · ${total} peças`;
+        toast(`${pieces.length} materiais · ${total} peças carregados.`);
+    } catch(e) {
+        toast("Erro ao carregar dados.", "error");
+    }
+}
+
+function renderTable() {
+    const tbody = document.getElementById("tbodyPecas");
+    if (pieces.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-soft)">Nenhuma peça.</td></tr>';
+        return;
+    }
+    let html = "";
+    pieces.forEach((p, i) => {
+        const matOpts = Object.keys(specs).sort().map(k =>
+            `<option value="${k}"${k === p.mat ? " selected" : ""}>${k}</option>`
+        ).join("");
+        const noMat = matOpts.includes('selected') ? '' : `<option value="${p.mat}" selected>${p.mat}</option>`;
+        html += `<tr>
+            <td style="text-align:center;color:var(--text-soft)">${i+1}</td>
+            <td><select onchange="upd(${i},'mat',this.value)" style="font-size:11px">${noMat}${matOpts}</select></td>
+            <td><input type="text" value="${p.desc}" onchange="upd(${i},'desc',this.value)"></td>
+            <td><input type="number" value="${p.l}" onchange="upd(${i},'l',+this.value)"></td>
+            <td><input type="number" value="${p.w}" onchange="upd(${i},'w',+this.value)"></td>
+            <td><input type="number" value="${p.q}" onchange="upd(${i},'q',+this.value)" min="1"></td>
+            <td style="text-align:center">
+                <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;font-weight:600;color:${p.rot!==false?'var(--primary)':'var(--text-soft)'}">
+                    <input type="checkbox" ${p.rot!==false?"checked":""} onchange="upd(${i},'rot',this.checked);renderTable()" style="accent-color:var(--primary);width:14px;height:14px">
+                    ${p.rot!==false?'Sim':'Não'}
+                </label>
+            </td>
+            <td>
+                <div class="check-wrap">
+                    <label><input type="checkbox" ${p.l1?"checked":""} onchange="upd(${i},'l1',this.checked)"> C1</label>
+                    <label><input type="checkbox" ${p.l2?"checked":""} onchange="upd(${i},'l2',this.checked)"> C2</label>
+                    <label><input type="checkbox" ${p.w1?"checked":""} onchange="upd(${i},'w1',this.checked)"> L1</label>
+                    <label><input type="checkbox" ${p.w2?"checked":""} onchange="upd(${i},'w2',this.checked)"> L2</label>
+                </div>
+            </td>
+            <td style="text-align:center">
+                <button class="btn-danger btn-sm" onclick="deletePiece(${i})" title="Excluir peça">🗑</button>
+            </td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function upd(i, f, v) {
+    pieces[i][f] = v;
+}
+
+function deletePiece(i) {
+    const nome = pieces[i].desc || `Peça ${i+1}`;
+    if (!confirm(`Excluir "${nome}"?`)) return;
+    pieces.splice(i, 1);
+    renderTable();
+    const total = pieces.reduce((s, p) => s + p.q, 0);
+    document.getElementById("infoTotal").textContent = pieces.length ? `${pieces.length} tipos · ${total} peças` : "";
+    toast(`"${nome}" excluída.`);
+}
+
+function adicionarLinha() {
+    const firstMat = Object.keys(specs)[0] || "Material";
+    const defaultRot = Object.keys(specs).length > 0 ? (specs[firstMat]?.rot ?? true) : true;
+    pieces.push({ mat: firstMat, desc: "Nova Peça", l: 500, w: 300, q: 1, rot: defaultRot, l1: false, l2: false, w1: false, w2: false });
+    renderTable();
+}
+
+function limparTudo() {
+    if (!confirm("Limpar todas as peças?")) return;
+    pieces = [];
+    renderTable();
+    document.getElementById("visual-area").innerHTML = EMPTY_STATE_HTML;
+}
+
+// =============================================================
+//  BIN PACKING — Guillotine BSSF + Shelf FFDH + Multi-Heurística
+//
+//  Dois algoritmos testados em 24 combinações por chapa:
+//
+//  1. ShelfPacker (FFDH — First Fit Decreasing Height):
+//     Cria faixas horizontais de borda a borda (igual software
+//     profissional). Cortes: 1 horizontal separa cada faixa;
+//     cortes verticais dentro de cada faixa. 100% guillotina.
+//
+//  2. GuillotinePacker (BSSF): divide área livre em 2 retângulos
+//     por corte — melhor quando peças têm alturas muito variadas.
+//
+//  O melhor resultado (mais peças × maior área) é escolhido.
+//  rot:false = veio fixo, nunca gira (madeirado/textura).
+// =============================================================
+
+// --- SHELF PACKER (FFDH) -----------------------------------
+class ShelfPacker {
+    constructor(w, h) { this._W = w; this._H = h; }
+
+    pack(blocks) {
+        const shelves = [];  // { y, h, usedW }
+        let usedH = 0;
+        const placed = [];
+
+        for (const b of blocks) {
+            let fitted = false;
+
+            // Tenta encaixar em prateleira já aberta (First Fit)
+            for (const sh of shelves) {
+                if (!fitted && b.h <= sh.h && sh.usedW + b.w <= this._W) {
+                    placed.push({ ...b, fit:{ x:sh.usedW, y:sh.y }, rotated:false });
+                    sh.usedW += b.w;
+                    fitted = true;
+                }
+                if (!fitted && b.rot && b.w !== b.h && b.w <= sh.h && sh.usedW + b.h <= this._W) {
+                    placed.push({ ...b, fit:{ x:sh.usedW, y:sh.y }, rotated:true });
+                    sh.usedW += b.h;
+                    fitted = true;
+                }
+                if (fitted) break;
+            }
+
+            if (!fitted) {
+                // Abre nova prateleira — testa as duas orientações
+                const opts = [{ fw:b.w, fh:b.h, rot:false }];
+                if (b.rot && b.w !== b.h) opts.push({ fw:b.h, fh:b.w, rot:true });
+                for (const o of opts) {
+                    if (usedH + o.fh <= this._H && o.fw <= this._W) {
+                        shelves.push({ y:usedH, h:o.fh, usedW:o.fw });
+                        placed.push({ ...b, fit:{ x:0, y:usedH }, rotated:o.rot });
+                        usedH += o.fh;
+                        fitted = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return placed;
+    }
+}
+
+// --- SKYLINE PACKER (Bottom-Left Best Fit) ------------------
+//  Mantém uma "linha do céu" variável — encaixa cada peça no
+//  ponto mais baixo disponível. Gera ~95-97% de aproveitamento
+//  pois peças de alturas diferentes preenchem as colunas livres.
+class SkylinePacker {
+    constructor(w, h) {
+        this._W = w; this._H = h;
+        this._sky = [{x:0, y:0, w:w}]; // skyline cobre [0,W] inteiro
+    }
+
+    _findBest(bw, bh) {
+        let bestY = Infinity, bestWaste = Infinity, bestX = -1;
+        const sky = this._sky;
+        for (let i = 0; i < sky.length; i++) {
+            const x = sky[i].x;
+            if (x + bw > this._W) continue;
+            let maxY = 0, covered = 0, wSum = 0;
+            for (let j = i; j < sky.length && covered < bw; j++) {
+                const take = Math.min(sky[j].w, bw - covered);
+                if (sky[j].y > maxY) maxY = sky[j].y;
+                wSum += sky[j].y * take;
+                covered += take;
+            }
+            if (covered < bw) continue;
+            if (maxY + bh > this._H) continue;
+            const waste = maxY * bw - wSum;
+            if (maxY < bestY || (maxY === bestY && waste < bestWaste)) {
+                bestY = maxY; bestWaste = waste; bestX = x;
+            }
+        }
+        return bestX >= 0 ? {x:bestX, y:bestY, waste:bestWaste} : null;
+    }
+
+    _place(x, y, bw, bh) {
+        const x2 = x + bw, newY = y + bh;
+        const out = [];
+        for (const seg of this._sky) {
+            const sx2 = seg.x + seg.w;
+            if (sx2 <= x || seg.x >= x2) { out.push({x:seg.x, y:seg.y, w:seg.w}); continue; }
+            if (seg.x < x) out.push({x:seg.x, y:seg.y, w:x - seg.x});
+            out.push({x:Math.max(seg.x,x), y:newY, w:Math.min(sx2,x2) - Math.max(seg.x,x)});
+            if (sx2 > x2) out.push({x:x2, y:seg.y, w:sx2 - x2});
+        }
+        out.sort((a,b) => a.x - b.x);
+        this._sky = [];
+        for (const s of out) {
+            if (s.w <= 0) continue;
+            const last = this._sky[this._sky.length-1];
+            if (last && last.y === s.y && last.x + last.w === s.x) last.w += s.w;
+            else this._sky.push({...s});
+        }
+    }
+
+    pack(blocks) {
+        const placed = [];
+        for (const b of blocks) {
+            let best = null, rotated = false;
+            const p1 = this._findBest(b.w, b.h);
+            if (p1) { best = p1; rotated = false; }
+            if (b.rot && b.w !== b.h) {
+                const p2 = this._findBest(b.h, b.w);
+                if (p2 && (!best || p2.y < best.y || (p2.y === best.y && p2.waste < best.waste))) {
+                    best = p2; rotated = true;
+                }
+            }
+            if (!best) continue;
+            const pw = rotated ? b.h : b.w, ph = rotated ? b.w : b.h;
+            placed.push({...b, fit:{x:best.x, y:best.y}, rotated});
+            this._place(best.x, best.y, pw, ph);
+        }
+        return placed;
+    }
+}
+
+// --- GUILLOTINE PACKER (BSSF) ------------------------------
+class GuillotinePacker {
+    constructor(w, h) { this._W = w; this._H = h; }
+
+    pack(blocks) {
+        const freeList = [{ x:0, y:0, w:this._W, h:this._H }];
+        const placed   = [];
+        const rem      = [...blocks];
+
+        while (rem.length > 0) {
+            let best = null, bestS1 = Infinity, bestS2 = Infinity;
+            for (let fi = 0; fi < freeList.length; fi++) {
+                const fr = freeList[fi];
+                for (let bi = 0; bi < rem.length; bi++) {
+                    const b = rem[bi];
+                    if (b.w <= fr.w && b.h <= fr.h) {
+                        const s1 = Math.min(fr.w-b.w, fr.h-b.h), s2 = Math.max(fr.w-b.w, fr.h-b.h);
+                        if (s1 < bestS1 || (s1===bestS1 && s2<bestS2)) { bestS1=s1; bestS2=s2; best={fi,bi,pw:b.w,ph:b.h,rotated:false}; }
+                    }
+                    if (b.rot && b.w!==b.h && b.h<=fr.w && b.w<=fr.h) {
+                        const s1 = Math.min(fr.w-b.h, fr.h-b.w), s2 = Math.max(fr.w-b.h, fr.h-b.w);
+                        if (s1 < bestS1 || (s1===bestS1 && s2<bestS2)) { bestS1=s1; bestS2=s2; best={fi,bi,pw:b.h,ph:b.w,rotated:true}; }
+                    }
+                }
+            }
+            if (!best) break;
+            const fr = freeList[best.fi];
+            placed.push({ ...rem[best.bi], fit:{x:fr.x,y:fr.y}, rotated:best.rotated });
+            rem.splice(best.bi, 1);
+            freeList.splice(best.fi, 1);
+            const rW = fr.w-best.pw, rH = fr.h-best.ph;
+            if (Math.max(rW*fr.h, best.pw*rH) >= Math.max(fr.w*rH, rW*best.ph)) {
+                if (rW>0) freeList.push({x:fr.x+best.pw, y:fr.y,        w:rW,     h:fr.h   });
+                if (rH>0) freeList.push({x:fr.x,          y:fr.y+best.ph, w:best.pw, h:rH  });
+            } else {
+                if (rH>0) freeList.push({x:fr.x,          y:fr.y+best.ph, w:fr.w,   h:rH   });
+                if (rW>0) freeList.push({x:fr.x+best.pw,  y:fr.y,         w:rW,     h:best.ph});
+            }
+        }
+        return placed;
+    }
+}
+
+// =============================================================
+//  jakesgordon/bin-packing — MIT License
+//  Copyright (c) 2011-2016 Jake Gordon and contributors
+//  Source: https://github.com/jakesgordon/bin-packing
+// =============================================================
+
+// --- packer.js (verbatim) — árvore binária com tamanho fixo ---
+var Packer = function(w, h) {
+  this.init(w, h);
+};
+Packer.prototype = {
+  init: function(w, h) {
+    this.root = { x: 0, y: 0, w: w, h: h };
+  },
+  fit: function(blocks) {
+    var n, node, block;
+    for (n = 0; n < blocks.length; n++) {
+      block = blocks[n];
+      if (node = this.findNode(this.root, block.w, block.h))
+        block.fit = this.splitNode(node, block.w, block.h);
+    }
+  },
+  findNode: function(root, w, h) {
+    if (root.used)
+      return this.findNode(root.right, w, h) || this.findNode(root.down, w, h);
+    else if ((w <= root.w) && (h <= root.h))
+      return root;
+    else
+      return null;
+  },
+  splitNode: function(node, w, h) {
+    node.used = true;
+    node.down  = { x: node.x,     y: node.y + h, w: node.w,     h: node.h - h };
+    node.right = { x: node.x + w, y: node.y,     w: node.w - w, h: h          };
+    return node;
+  }
+};
+
+// --- packer.growing.js (verbatim) — cresce automaticamente ---
+var GrowingPacker = function() { };
+GrowingPacker.prototype = {
+  fit: function(blocks) {
+    var n, node, block, len = blocks.length;
+    var w = len > 0 ? blocks[0].w : 0;
+    var h = len > 0 ? blocks[0].h : 0;
+    this.root = { x: 0, y: 0, w: w, h: h };
+    for (n = 0; n < len ; n++) {
+      block = blocks[n];
+      if (node = this.findNode(this.root, block.w, block.h))
+        block.fit = this.splitNode(node, block.w, block.h);
+      else
+        block.fit = this.growNode(block.w, block.h);
+    }
+  },
+  findNode: function(root, w, h) {
+    if (root.used)
+      return this.findNode(root.right, w, h) || this.findNode(root.down, w, h);
+    else if ((w <= root.w) && (h <= root.h))
+      return root;
+    else
+      return null;
+  },
+  splitNode: function(node, w, h) {
+    node.used = true;
+    node.down  = { x: node.x,     y: node.y + h, w: node.w,     h: node.h - h };
+    node.right = { x: node.x + w, y: node.y,     w: node.w - w, h: h          };
+    return node;
+  },
+  growNode: function(w, h) {
+    var canGrowDown  = (w <= this.root.w);
+    var canGrowRight = (h <= this.root.h);
+    var shouldGrowRight = canGrowRight && (this.root.h >= (this.root.w + w));
+    var shouldGrowDown  = canGrowDown  && (this.root.w >= (this.root.h + h));
+    if      (shouldGrowRight) return this.growRight(w, h);
+    else if (shouldGrowDown)  return this.growDown(w, h);
+    else if (canGrowRight)    return this.growRight(w, h);
+    else if (canGrowDown)     return this.growDown(w, h);
+    else                      return null;
+  },
+  growRight: function(w, h) {
+    this.root = {
+      used: true, x: 0, y: 0,
+      w: this.root.w + w, h: this.root.h,
+      down:  this.root,
+      right: { x: this.root.w, y: 0, w: w, h: this.root.h }
+    };
+    var node;
+    if (node = this.findNode(this.root, w, h)) return this.splitNode(node, w, h);
+    else                                        return null;
+  },
+  growDown: function(w, h) {
+    this.root = {
+      used: true, x: 0, y: 0,
+      w: this.root.w, h: this.root.h + h,
+      down:  { x: 0, y: this.root.h, w: this.root.w, h: h },
+      right: this.root
+    };
+    var node;
+    if (node = this.findNode(this.root, w, h)) return this.splitNode(node, w, h);
+    else                                        return null;
+  }
+};
+
+// --- Adaptador: GrowingPacker com limite de chapa (uW × uH) ---
+//  Usa o GrowingPacker original via delegação. Sobrescreve growRight
+//  e growDown para não ultrapassar os limites da chapa.
+//  Adiciona pack(blocks) → array placed[] com suporte a rotação (rot).
+class GrowingPackerBounded {
+    constructor(uW, uH) {
+        this._uW = uW;
+        this._uH = uH;
+    }
+
+    pack(blocks) {
+        if (blocks.length === 0) return [];
+
+        // Cria instância do GrowingPacker original
+        const packer = new GrowingPacker();
+        const uW = this._uW, uH = this._uH;
+
+        // Sobrescreve growRight/growDown para respeitar os limites
+        packer.growRight = function(w, h) {
+            if (this.root.w + w > uW) return null;
+            this.root = {
+                used: true, x: 0, y: 0,
+                w: this.root.w + w, h: this.root.h,
+                down:  this.root,
+                right: { x: this.root.w, y: 0, w: w, h: this.root.h }
+            };
+            var node;
+            if (node = this.findNode(this.root, w, h)) return this.splitNode(node, w, h);
+            else                                        return null;
+        };
+        packer.growDown = function(w, h) {
+            if (this.root.h + h > uH) return null;
+            this.root = {
+                used: true, x: 0, y: 0,
+                w: this.root.w, h: this.root.h + h,
+                down:  { x: 0, y: this.root.h, w: this.root.w, h: h },
+                right: this.root
+            };
+            var node;
+            if (node = this.findNode(this.root, w, h)) return this.splitNode(node, w, h);
+            else                                        return null;
+        };
+
+        // Inicializa root com a primeira peça (limitada ao tamanho da chapa)
+        const w0 = Math.min(blocks[0].w, uW);
+        const h0 = Math.min(blocks[0].h, uH);
+        packer.root = { x: 0, y: 0, w: w0, h: h0 };
+
+        const placed = [];
+        for (const b of blocks) {
+            let node = packer.findNode(packer.root, b.w, b.h);
+            let rotated = false;
+            // Tenta girar se não couber (rot:true = peça permite rotação)
+            if (!node && b.rot && b.w !== b.h) {
+                node = packer.findNode(packer.root, b.h, b.w);
+                if (node) rotated = true;
+            }
+            let fit;
+            if (node) {
+                const pw = rotated ? b.h : b.w, ph = rotated ? b.w : b.h;
+                fit = packer.splitNode(node, pw, ph);
+            } else {
+                fit = packer.growNode(b.w, b.h);
+                if (!fit && b.rot && b.w !== b.h) {
+                    fit = packer.growNode(b.h, b.w);
+                    if (fit) rotated = true;
+                }
+            }
+            if (fit) placed.push({ ...b, fit: { x: fit.x, y: fit.y }, rotated });
+        }
+        return placed;
+    }
+}
+
+// --- ORDENAÇÕES ----------------------------------------
+const _SORTS = [
+    b => [-b.h,              -b.w*b.h],   // altura desc   (ideal shelf)
+    b => [-b.w*b.h,           0      ],   // área desc
+    b => [-Math.max(b.w,b.h), -b.w*b.h], // lado maior desc
+    b => [-(b.w+b.h),         0      ],   // perímetro desc
+    b => [-b.w,              -b.h    ],   // largura desc
+    b => [-Math.min(b.w,b.h), 0      ],   // lado menor desc
+];
+
+function _sortBlocks(blocks, keyFn) {
+    return [...blocks].sort((a, b) => {
+        const ka = keyFn(a), kb = keyFn(b);
+        for (let i = 0; i < ka.length; i++) { if (ka[i] !== kb[i]) return ka[i]-kb[i]; }
+        return 0;
+    });
+}
+
+// Testa combinações (6 ordens × algoritmos × 2 pré-rotações)
+function _bestPack(blocks, uW, uH, overrideAlgo) {
+    const algo = overrideAlgo || (document.getElementById('algoritmo') || {}).value || 'auto';
+    let best = null, bestScore = -1;
+    const score = placed => placed.length * 1e12 + placed.reduce((s,b)=>s+b.w*b.h, 0);
+    const deRot = arr => arr.map(p => p._preRot ? {...p, rotated:!p.rotated} : p);
+
+    // Quais classes testar de acordo com a opção escolhida
+    // shelf      = Corte Reto (faixas horizontais, sempre guilhotina)
+    // guillotine = Corte Cruzado (guilhotina BSSF em 2 direções)
+    // growing    = Corte Livre (árvore binária, máximo aproveitamento local)
+    // auto       = Total: testa todos e escolhe o melhor resultado
+    const classes = algo === 'shelf'      ? [ShelfPacker]
+                  : algo === 'guillotine' ? [GuillotinePacker]
+                  : algo === 'growing'    ? ['growing']
+                  : [ShelfPacker, GuillotinePacker, SkylinePacker, 'growing']; // auto: testa todos
+
+    for (const keyFn of _SORTS) {
+        const sorted = _sortBlocks(blocks, keyFn);
+        const rotPre = _sortBlocks(
+            blocks.map(b => b.rot && b.h > b.w ? {...b, w:b.h, h:b.w, _preRot:true} : b),
+            keyFn
+        );
+        for (const [input, doDeRot] of [[sorted, false], [rotPre, true]]) {
+            for (const Cls of classes) {
+                let placed;
+                if (Cls === 'growing') {
+                    // GrowingPackerBounded: container cresce até uW×uH
+                    placed = new GrowingPackerBounded(uW, uH).pack(input);
+                } else {
+                    placed = new Cls(uW, uH).pack(input);
+                }
+                const result = doDeRot ? deRot(placed) : placed;
+                const sc = score(result);
+                if (sc > bestScore) { bestScore = sc; best = result; }
+            }
+        }
+    }
+    return best || [];
+}
+
+// =============================================================
+//  PREENCHER ESPAÇOS LIVRES DA CHAPA (2ª passagem)
+//  Detecta todos os retângulos livres após o encaixe inicial
+//  e tenta encaixar peças remanescentes em cada um deles.
+// =============================================================
+// Algoritmo MaxRects: subtrai área ocupada de lista de retângulos livres
+// Garante que nenhum rect resultado contenha área ocupada
+function _maxRectsSubtract(freeRects, px1, py1, pw, ph) {
+    const px2 = px1 + pw, py2 = py1 + ph;
+    const result = [];
+    for (const fr of freeRects) {
+        const fx2 = fr.x + fr.w, fy2 = fr.y + fr.h;
+        // Sem sobreposição — mantém
+        if (px2 <= fr.x || px1 >= fx2 || py2 <= fr.y || py1 >= fy2) { result.push(fr); continue; }
+        // Gera até 4 rects máximos (podem se sobrepor entre si — normal no MaxRects)
+        if (fr.x < px1)  result.push({ x: fr.x, y: fr.y, w: px1 - fr.x, h: fr.h });
+        if (fx2 > px2)   result.push({ x: px2,  y: fr.y, w: fx2 - px2,  h: fr.h });
+        if (fr.y < py1)  result.push({ x: fr.x, y: fr.y, w: fr.w,        h: py1 - fr.y });
+        if (fy2 > py2)   result.push({ x: fr.x, y: py2,  w: fr.w,        h: fy2 - py2  });
+    }
+    // Remove rects completamente contidos em outro
+    return result.filter((a, ai) => !result.some((b, bi) =>
+        bi !== ai && b.x <= a.x && b.y <= a.y &&
+        b.x + b.w >= a.x + a.w && b.y + b.h >= a.y + a.h
+    ));
+}
+
+function _encherEspacosLivres(placed, rem, uW, uH, kerf) {
+    if (rem.length === 0) return [];
+
+    // Calcula espaços livres reais via MaxRects
+    let freeRects = [{ x: 0, y: 0, w: uW, h: uH }];
+    for (const it of placed) {
+        const pw = it.rotated ? it.h : it.w;
+        const ph = it.rotated ? it.w : it.h;
+        freeRects = _maxRectsSubtract(freeRects, it.fit.x, it.fit.y, pw, ph);
+    }
+
+    // ── Fase 1: _bestPack por rect livre (maior área primeiro) ──────────────
+    freeRects.sort((a, b) => (b.w * b.h) - (a.w * a.h));
+    const extra = [];
+    const usedIds = new Set(placed.map(b => b._id));
+    const occupied = placed.map(it => {
+        const pw = it.rotated ? it.h : it.w;
+        const ph = it.rotated ? it.w : it.h;
+        return { x: it.fit.x, y: it.fit.y, w: pw, h: ph };
+    });
+
+    for (const fr of freeRects) {
+        if (fr.w < 30 || fr.h < 30) continue;
+
+        const cand = rem.filter(b => !usedIds.has(b._id) && (
+            (b.w <= fr.w && b.h <= fr.h) ||
+            (b.rot && b.h <= fr.w && b.w <= fr.h)
+        ));
+        if (cand.length === 0) continue;
+
+        // CORRIGIDO: b.w já inclui kerf — passa fr.w/fr.h diretamente
+        const result = _bestPack(cand, fr.w, fr.h, 'auto');
+
+        for (const p of result) {
+            const pw2 = p.rotated ? p.h : p.w;
+            const ph2 = p.rotated ? p.w : p.h;
+            const px = fr.x + p.fit.x;
+            const py = fr.y + p.fit.y;
+            const colide = occupied.some(occ =>
+                px < occ.x + occ.w - 1 && px + pw2 > occ.x + 1 &&
+                py < occ.y + occ.h - 1 && py + ph2 > occ.y + 1
+            );
+            if (colide) continue;
+            extra.push({ ...p, fit: { x: px, y: py } });
+            usedIds.add(p._id);
+            occupied.push({ x: px, y: py, w: pw2, h: ph2 });
+        }
+    }
+
+    // ── Fase 2: BSSF (Best Short Side Fit) peça-a-peça ──────────────────────
+    // Recomputa rects livres após as colocações acima e encaixa
+    // as peças restantes uma a uma, recomputando a cada passo.
+    // Garante aproveitamento de rects parcialmente preenchidos.
+    let allPlaced = [...placed, ...extra];
+    let freeRects2 = [{ x: 0, y: 0, w: uW, h: uH }];
+    for (const it of allPlaced) {
+        const pw = it.rotated ? it.h : it.w;
+        const ph = it.rotated ? it.w : it.h;
+        freeRects2 = _maxRectsSubtract(freeRects2, it.fit.x, it.fit.y, pw, ph);
+    }
+
+    const extra2 = [];
+    let candidates = rem.filter(b => !usedIds.has(b._id));
+
+    let improved = true;
+    while (improved && candidates.length > 0 && freeRects2.length > 0) {
+        improved = false;
+        let bestScore = Infinity, bestPlace = null;
+
+        for (const b of candidates) {
+            for (const fr of freeRects2) {
+                if (b.w <= fr.w && b.h <= fr.h) {
+                    const s = Math.min(fr.w - b.w, fr.h - b.h);
+                    if (s < bestScore) { bestScore = s; bestPlace = { b, fr, rotated: false, pw: b.w, ph: b.h }; }
+                }
+                if (b.rot && b.w !== b.h && b.h <= fr.w && b.w <= fr.h) {
+                    const s = Math.min(fr.w - b.h, fr.h - b.w);
+                    if (s < bestScore) { bestScore = s; bestPlace = { b, fr, rotated: true, pw: b.h, ph: b.w }; }
+                }
+            }
+        }
+
+        if (bestPlace) {
+            improved = true;
+            const { b, fr, rotated, pw, ph } = bestPlace;
+            extra2.push({ ...b, fit: { x: fr.x, y: fr.y }, rotated });
+            usedIds.add(b._id);
+            candidates = candidates.filter(c => c._id !== b._id);
+            freeRects2 = _maxRectsSubtract(freeRects2, fr.x, fr.y, pw, ph);
+        }
+    }
+
+    return [...extra, ...extra2];
+}
+
+// =============================================================
+//  GERAR PLANO
+// =============================================================
+function gerarPlano() {
+    if (pieces.length === 0) { toast("Nenhuma peça na lista.", "error"); return; }
+
+    sheets = [];
+    const container = document.getElementById("visual-area");
+    container.innerHTML = '<div class="empty-state"><div class="icon" style="font-size:2rem">⚙️</div><p style="font-weight:600">Calculando...</p></div>';
+
+    const groups = {};
+    let _uid = 0;
+    pieces.forEach(p => {
+        if (p.q <= 0) return;
+        const spec = getSpec(p.mat);
+        if (!groups[p.mat]) groups[p.mat] = { blocks:[], spec };
+        for (let i=0; i<p.q; i++) {
+            // rot: peça sobrescreve spec quando definida manualmente
+            const canRot = p.rot !== undefined ? p.rot : spec.rot;
+            groups[p.mat].blocks.push({
+                _id: _uid++,
+                w: p.l + spec.kerf, h: p.w + spec.kerf,
+                realL: p.l, realW: p.w,
+                desc: p.desc, mat: p.mat,
+                l1: p.l1, l2: p.l2, w1: p.w1, w2: p.w2,
+                rot: canRot
+            });
+        }
+    });
+
+    for (const mat in groups) {
+        const { blocks, spec } = groups[mat];
+        const uW = spec.L - spec.trim*2;
+        const uH = spec.W - spec.trim*2;
+        let rem = [...blocks], matSheets = [];
+
+        while (rem.length > 0) {
+            // Abre sempre uma chapa cheia
+            let placed = _bestPack(rem, uW, uH);
+            if (placed.length === 0) {
+                toast(`"${rem[0].desc}" não cabe na chapa de "${mat}". Verifique as dimensões.`, "error");
+                break;
+            }
+            let placedIds = new Set(placed.map(b => b._id));
+            rem = rem.filter(b => !placedIds.has(b._id));
+
+            // Passagens múltiplas: detecta TODOS os espaços livres via MaxRects
+            // e encaixa peças remanescentes usando o melhor algoritmo disponível.
+            // Repete até estabilizar (nova peça encaixada pode abrir espaço para outra).
+            let improved = true;
+            while (improved && rem.length > 0) {
+                const extra = _encherEspacosLivres(placed, rem, uW, uH, spec.kerf);
+                improved = extra.length > 0;
+                if (improved) {
+                    placed = [...placed, ...extra];
+                    const extraIds = new Set(extra.map(b => b._id));
+                    rem = rem.filter(b => !extraIds.has(b._id));
+                }
+            }
+
+            // Calcula sobra final para exibição visual no canvas
+            maxOccY = 0;
+            placed.forEach(it => {
+                const ph = it.rotated ? it.w : it.h;
+                if (it.fit.y + ph > maxOccY) maxOccY = it.fit.y + ph;
+            });
+            const sobraH = Math.floor(uH - maxOccY);
+
+            matSheets.push({
+                items: placed, isSobra: false, sobraLabel: "",
+                width: spec.L, height: spec.W,
+                _sobraH: sobraH, _sobraL: spec.L
+            });
+        }
+
+        matSheets.forEach((sh, idx) => {
+            sheets.push({
+                mat, items: sh.items,
+                width: sh.width, height: sh.height,
+                kerf: spec.kerf,
+                trim: spec.trim,
+                color: spec.color,
+                index: idx+1, total: matSheets.length,
+                isSobra: false, sobraLabel: "",
+                _sobraH: sh._sobraH, _sobraL: sh._sobraL
+            });
+        });
+    }
+
+    if (sheets.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p style="font-weight:600">Nenhum plano gerado. Verifique as peças.</p></div>';
+        return;
+    }
+
+    const vw = Math.min(container.offsetWidth || 900, 980);
+    container.innerHTML = sheets.map(s => renderSheet(s, vw)).join("");
+    toast(`Plano gerado: ${sheets.length} chapa(s).`);
+}
+
+// =============================================================
+//  RENDERIZAR CHAPA
+// =============================================================
+function renderSheet(sheet, vw) {
+    const scale    = vw / sheet.width;
+    // Escala de impressão: canvas+régua (vw+50) precisa caber em ~900px (A4 landscape ~272mm a 96dpi ≈ 1030px, menos margens)
+    const printScale = Math.min(1, Math.round((860 / (vw + 50)) * 100) / 100);
+    const usedArea = sheet.items.reduce((a,it)=>a+it.realL*it.realW, 0);
+    const totalArea = sheet.width * sheet.height;
+    const perc     = ((usedArea / totalArea)*100).toFixed(1);
+    const freeArea = totalArea - usedArea;
+    const cliente  = document.getElementById("clientName").value || "—";
+
+    // Calcula áreas livres (sobras) ANTES de renderizar linhas de corte,
+    // para clipar as linhas e não cruzar a área de sobra aproveitável.
+    let freeRects = [];
+    let sobraOverlayHtml = "";
+    {
+        const uW = sheet.width  - sheet.trim * 2;
+        const uH = sheet.height - sheet.trim * 2;
+        freeRects = [{ x: 0, y: 0, w: uW, h: uH }];
+        for (const it of sheet.items) {
+            const pw = it.rotated ? (it.realW) : (it.realL);
+            const ph = it.rotated ? (it.realL) : (it.realW);
+            freeRects = _maxRectsSubtract(freeRects, it.fit.x, it.fit.y, pw + sheet.kerf, ph + sheet.kerf);
+        }
+        freeRects = freeRects.filter(r => r.w >= 50 && r.h >= 50);
+        for (const fr of freeRects) {
+            const fx = (fr.x + sheet.trim) * scale;
+            const fy = (fr.y + sheet.trim) * scale;
+            const fw = fr.w * scale;
+            const fh = fr.h * scale;
+            sobraOverlayHtml += `
+        <div class="sobra-overlay" style="left:${fx}px;top:${fy}px;width:${fw}px;height:${fh}px;">
+            <span class="sobra-overlay-label">${Math.round(fr.w)} × ${Math.round(fr.h)} mm</span>
+        </div>`;
+        }
+    }
+    // Converte freeRects para pixels para clipar as linhas de corte
+    const freeRectsPx = freeRects.map(fr => ({
+        x: (fr.x + sheet.trim) * scale,
+        y: (fr.y + sheet.trim) * scale,
+        w: fr.w * scale,
+        h: fr.h * scale
+    }));
+
+    // Canvas — peças + coleta de posições únicas de corte
+    let piecesHtml = "";
+    const cutYsMap = new Map(); // ypx → ymm
+    const cutXsMap = new Map(); // xpx → xmm
+    sheet.items.forEach((it, i) => {
+        let dW = it.rotated ? it.realW*scale : it.realL*scale;
+        let dH = it.rotated ? it.realL*scale : it.realW*scale;
+        const x = (it.fit.x + sheet.trim)*scale;
+        const y = (it.fit.y + sheet.trim)*scale;
+        const hue = (it.realL*it.realW) % 360;
+        let tL1=it.l1,tL2=it.l2,tW1=it.w1,tW2=it.w2;
+        if(it.rotated){tL1=it.w1;tL2=it.w2;tW1=it.l1;tW2=it.l2;}
+        const dimTop  = it.rotated ? it.realW : it.realL;
+        const dimLeft = it.rotated ? it.realL : it.realW;
+        piecesHtml += `
+        <div class="piece" style="left:${x}px;top:${y}px;width:${dW}px;height:${dH}px;background:hsl(${hue},45%,88%);">
+            ${tL1?'<div class="tape t-top"></div>':''}
+            ${tL2?'<div class="tape t-btm"></div>':''}
+            ${tW1?'<div class="tape t-lft"></div>':''}
+            ${tW2?'<div class="tape t-rgt"></div>':''}
+            ${dW > 30 ? `<div class="dim-w">${dimTop}</div>` : ''}
+            ${dH > 30 ? `<div class="dim-h">${dimLeft}</div>` : ''}
+            <div class="piece-label">
+                <div class="piece-desc"
+                    style="${dH > dW ? 'writing-mode:vertical-rl;transform:rotate(180deg);max-height:'+Math.round(dH-8)+'px;' : 'max-width:'+Math.round(dW-8)+'px;'}">
+                    <span class="piece-num" style="background:hsl(${hue},60%,45%);color:#fff;padding:0 4px;border-radius:3px;font-weight:800;margin-right:3px;writing-mode:initial;transform:none;display:inline-block;vertical-align:middle">${i+1}</span>${it.desc}${it.rotated ? ' ↺' : ''}
+                </div>
+            </div>
+        </div>`;
+        // Coleta posições únicas de corte + extensão máxima de peças por linha
+        const cy = Math.round(y + dH + (sheet.kerf*scale)/2);
+        const cx = Math.round(x + dW + (sheet.kerf*scale)/2);
+        const cyMm = Math.round(it.fit.y + (it.rotated ? it.realL : it.realW) + sheet.kerf);
+        const cxMm = Math.round(it.fit.x + (it.rotated ? it.realW : it.realL) + sheet.kerf);
+        // Para cada linha H: rastreia até onde (direita) as peças chegam
+        const prev_h = cutYsMap.get(cy);
+        if (!prev_h) cutYsMap.set(cy, { mm: cyMm, xMax: x + dW });
+        else if (x + dW > prev_h.xMax) prev_h.xMax = x + dW;
+        // Para cada linha V: rastreia até onde (baixo) as peças chegam
+        const prev_v = cutXsMap.get(cx);
+        if (!prev_v) cutXsMap.set(cx, { mm: cxMm, yMax: y + dH });
+        else if (y + dH > prev_v.yMax) prev_v.yMax = y + dH;
+    });
+    // ── Labels inline nas próprias linhas de corte ───────────────────────────
+    let cutLinesHtml = '';
+    const trimPx = sheet.trim * scale;
+
+    // Horizontal: começa no refile, clipa apenas em sobras à direita das peças
+    [...cutYsMap.entries()].sort((a,b)=>a[0]-b[0]).forEach(([ypx, {mm: ymm, xMax}]) => {
+        let clippedX = xMax;
+        for (const fr of freeRectsPx) {
+            if (ypx >= fr.y - 2 && ypx <= fr.y + fr.h + 2 && fr.x < clippedX && fr.x > trimPx + 2) clippedX = fr.x;
+        }
+        const lineWidth = Math.round(clippedX - trimPx);
+        if (lineWidth < 4) return;
+        cutLinesHtml += `<div class="cut-line-h" style="top:${ypx}px;left:${trimPx}px;width:${lineWidth}px;">`
+            + `<span class="cut-label-h">${ymm}</span></div>`;
+    });
+
+    // Vertical: começa no refile, clipa apenas em sobras abaixo das peças
+    [...cutXsMap.entries()].sort((a,b)=>a[0]-b[0]).forEach(([xpx, {mm: xmm, yMax}]) => {
+        let clippedY = yMax;
+        for (const fr of freeRectsPx) {
+            if (xpx >= fr.x - 2 && xpx <= fr.x + fr.w + 2 && fr.y < clippedY && fr.y > trimPx + 2) clippedY = fr.y;
+        }
+        const lineHeight = Math.round(clippedY - trimPx);
+        if (lineHeight < 4) return;
+        cutLinesHtml += `<div class="cut-line-v" style="left:${xpx}px;top:${trimPx}px;height:${lineHeight}px;">`
+            + `<span class="cut-label-v">${xmm}</span></div>`;
+    });
+
+    // Lista
+    const listRows = sheet.items.map((it,i) => {
+        const girou = it.rotated ? '<span class="status-yes">Sim</span>' : '<span style="color:var(--text-soft)">—</span>';
+        let tapes = "";
+        if(it.rotated){
+            if(it.w1)tapes+='<span class="tape-badge">C1</span>';
+            if(it.w2)tapes+='<span class="tape-badge">C2</span>';
+            if(it.l1)tapes+='<span class="tape-badge">L1</span>';
+            if(it.l2)tapes+='<span class="tape-badge">L2</span>';
+        } else {
+            if(it.l1)tapes+='<span class="tape-badge">C1</span>';
+            if(it.l2)tapes+='<span class="tape-badge">C2</span>';
+            if(it.w1)tapes+='<span class="tape-badge">L1</span>';
+            if(it.w2)tapes+='<span class="tape-badge">L2</span>';
+        }
+        if(!tapes)tapes='<span style="color:var(--text-soft)">—</span>';
+        return `<tr>
+            <td style="text-align:center;color:var(--text-soft)">${i+1}</td>
+            <td><b>${it.desc}</b></td>
+            <td style="text-align:center" class="dim-hl">${it.realL} × ${it.realW}</td>
+            <td style="text-align:center">${girou}</td>
+            <td style="text-align:center">${tapes}</td>
+        </tr>`;
+    }).join("");
+
+    return `
+    <div class="sheet-display">
+        <div class="sheet-header">
+            <div>
+                <div class="sheet-title">
+                    ${sheet.mat} &nbsp;·&nbsp; ${sheet.width}×${sheet.height}mm &nbsp;·&nbsp; Chapa ${sheet.index}/${sheet.total}
+                    ${sheet.isSobra ? `<span class="badge-sobra">SOBRA</span> <span style="font-size:11px;color:var(--text-soft);font-weight:400">${sheet.sobraLabel}</span>` : ''}
+                </div>
+                <div class="sheet-sub">Cliente: ${cliente} &nbsp;|&nbsp; Serra: ${sheet.kerf}mm &nbsp;|&nbsp; Refile: ${sheet.trim}mm
+                    &nbsp;|&nbsp; Área livre: <b>${(freeArea/10000).toFixed(1)} dm²</b> (${(100-parseFloat(perc)).toFixed(1)}%)
+                </div>
+            </div>
+            <div class="sheet-perc">${perc}%</div>
+        </div>
+        <div class="canvas-wrap" style="--print-scale:${printScale}">
+            <div class="sheet-canvas" style="width:${vw}px;height:${sheet.height*scale}px;background-color:${sheet.color};">
+                <div class="start-label">↘ Início</div>
+                <div style="position:absolute;border:1px dashed rgba(0,0,0,0.2);left:${sheet.trim*scale}px;top:${sheet.trim*scale}px;width:${(sheet.width-sheet.trim*2)*scale}px;height:${(sheet.height-sheet.trim*2)*scale}px;pointer-events:none;z-index:1;"></div>
+                ${piecesHtml}
+                ${cutLinesHtml}
+                ${sobraOverlayHtml}
+            </div>
+        </div>
+        <div class="cut-list-wrap">
+            <table class="cut-list-table">
+                <thead><tr><th style="width:32px">#</th><th>Descrição</th><th style="text-align:center">Dimensão</th><th style="text-align:center">Girou?</th><th style="text-align:center">Fitas</th></tr></thead>
+                <tbody>${listRows}</tbody>
+            </table>
+        </div>
+    </div>`;
+}
+
+// =============================================================
+//  INICIALIZAÇÃO
+// =============================================================
+loadSpecs();
+loadPieces();
+</script>
+</body>
+</html>

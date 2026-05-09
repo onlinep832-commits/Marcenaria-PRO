@@ -1,0 +1,6 @@
+# Arquivos locais do Electron — não enviar para o Netlify
+package.json
+package-lock.json
+script.js
+.netlify/
+README.md

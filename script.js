@@ -1,3 +1,17 @@
+// Função global para troca de abas do catálogo
+function switchCatTab(tabId) {
+    document.querySelectorAll(".cat-tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tabId));
+    document.querySelectorAll(".cat-tab-pane").forEach(pane => pane.classList.toggle("active", pane.id === tabId));
+    // Sincroniza o tipo de material para MDF ao abrir a aba MDF
+    const tipoSelect = document.getElementById("novoMaterialTipo");
+    if (tipoSelect) {
+        if (tabId === "cat-mdf") {
+            tipoSelect.value = "mdf";
+            tipoSelect.dispatchEvent(new Event("change"));
+        }
+    }
+}
+
 async function inicializarApp() {
     // --- ESTADO DA APLICAÇÃO ---
     let AppData = {};
@@ -1813,7 +1827,7 @@ async function inicializarApp() {
     const resetMaterialForm = () => {
         editingMaterialKey = null;
         editingMaterialType = null;
-        getEl("material-form-titulo").textContent = "Adicionar Novo Material";
+        getEl("material-form-titulo").textContent = "Adicionar Novo MDF";
         getEl("novoMaterialTipo").disabled = false;
         getEl("novoMaterialNome").readOnly = false;
         getEl("novoMaterialNome").value = "";
@@ -1830,29 +1844,59 @@ async function inicializarApp() {
         toggleMaterialPriceFields();
     };
 
+    const resetBordaForm = () => {
+        if (editingMaterialType === "coresBorda") { editingMaterialKey = null; editingMaterialType = null; }
+        getEl("borda-form-titulo").textContent = "Adicionar Nova Fita de Borda";
+        getEl("novaBordaNome").readOnly = false;
+        getEl("novaBordaNome").value = "";
+        getEl("novaBordaPrecoRolo").value = "";
+        getEl("novaBordaMetragemRolo").value = "";
+        getEl("novaBordaPrecoFinal").value = "";
+        getEl("novaBordaPreview").src = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+        currentImageUrl.material = null;
+        getEl("btnAddBorda").textContent = "Adicionar ao Catálogo";
+        getEl("btnAddBorda").classList.replace("btn-success", "btn-primary");
+        getEl("btnCancelarEdicaoBorda").style.display = "none";
+    };
+
     const carregarMaterialParaEdicao = (key, type) => {
         const item = AppData[type][key];
         if (!item) return;
-        resetMaterialForm();
-        editingMaterialKey = key;
-        editingMaterialType = type;
-        getEl("novoMaterialTipo").value = type === "coresMDF" ? "mdf" : "borda";
-        getEl("novoMaterialTipo").disabled = true;
-        toggleMaterialPriceFields();
-        getEl("novoMaterialNome").value = item.nome;
-        getEl("novoMaterialNome").readOnly = true;
-        getEl("novoMaterialPreview").src = item.imagem || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
-        currentImageUrl.material = item.imagem;
-        if (type === "coresMDF") {
+        if (type === "coresBorda") {
+            resetMaterialForm();
+            resetBordaForm();
+            editingMaterialKey = key;
+            editingMaterialType = type;
+            getEl("novaBordaNome").value = item.nome;
+            getEl("novaBordaNome").readOnly = true;
+            getEl("novaBordaPrecoFinal").value = item.preco.toFixed(2);
+            getEl("novaBordaPreview").src = item.imagem || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+            currentImageUrl.material = item.imagem;
+            getEl("borda-form-titulo").textContent = `Editando: ${item.nome}`;
+            getEl("btnAddBorda").textContent = "Salvar Alterações";
+            getEl("btnAddBorda").classList.replace("btn-primary", "btn-success");
+            getEl("btnCancelarEdicaoBorda").style.display = "inline-flex";
+            switchCatTab("cat-borda");
+        } else {
+            resetBordaForm();
+            resetMaterialForm();
+            editingMaterialKey = key;
+            editingMaterialType = type;
+            getEl("novoMaterialTipo").value = "mdf";
+            getEl("novoMaterialTipo").disabled = true;
+            toggleMaterialPriceFields();
+            getEl("novoMaterialNome").value = item.nome;
+            getEl("novoMaterialNome").readOnly = true;
+            getEl("novoMaterialPreview").src = item.imagem || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+            currentImageUrl.material = item.imagem;
             getEl("novoMaterialPrecoChapa").value = item.precoChapa ? item.precoChapa.toFixed(2) : "";
             getEl("novoMaterialPrecoCalculado").value = item.preco ? item.preco.toFixed(2) : "";
-        } else {
-            getEl("novoMaterialPrecoFinalBorda").value = item.preco.toFixed(2);
+            getEl("material-form-titulo").textContent = `Editando: ${item.nome}`;
+            getEl("btnAddMaterial").textContent = "Salvar Alterações";
+            getEl("btnAddMaterial").classList.replace("btn-primary", "btn-success");
+            getEl("btnCancelarEdicaoMaterial").style.display = "inline-flex";
+            switchCatTab("cat-mdf");
         }
-        getEl("material-form-titulo").textContent = `Editando: ${item.nome}`;
-        getEl("btnAddMaterial").textContent = "Salvar Alterações";
-        getEl("btnAddMaterial").classList.replace("btn-primary", "btn-success");
-        getEl("btnCancelarEdicaoMaterial").style.display = "inline-flex";
     };
 
     const carregarFerragemParaEdicao = (key) => {
@@ -1987,9 +2031,11 @@ async function inicializarApp() {
     getEl("btnNavGerenciarCatalogos").addEventListener("click", () => {
         resetHardwareForm();
         resetMaterialForm();
+        resetBordaForm();
         resetProfileForm();
         resetPecaPredefinidaForm();
         navigateTo("view-gerenciar-catalogos");
+        switchCatTab("cat-mdf");
     });
     getEl("btnSalvarDadosJson").addEventListener("click", salvarDados);
 
@@ -2055,6 +2101,7 @@ async function inicializarApp() {
                 saveAppState();
                 popularTodosSeletores();
                 resetMaterialForm();
+                resetBordaForm();
                 resetHardwareForm();
                 resetProfileForm();
                 resetPecaPredefinidaForm();
@@ -2067,6 +2114,45 @@ async function inicializarApp() {
     };
     ["listaCoresMDF", "listaCoresBorda", "listaFerragensCatalogo", "listaPecasPredefinidas", "listaPerfisPuxador"].forEach((id) => getEl(id).addEventListener("click", handleCatalogClick));
     getEl("novoMaterialTipo").addEventListener("change", toggleMaterialPriceFields);
+    getEl("btnCancelarEdicaoBorda").addEventListener("click", resetBordaForm);
+    getEl("btnAddBorda").addEventListener("click", () => {
+        if (editingMaterialKey && editingMaterialType === "coresBorda") {
+            const item = AppData.coresBorda[editingMaterialKey];
+            const preco = parseFloat(getEl("novaBordaPrecoFinal").value);
+            if (isNaN(preco)) return showToast("Preço inválido.", "error");
+            item.preco = preco;
+            item.imagem = currentImageUrl.material;
+            saveAppState();
+            popularTodosSeletores();
+            showToast(`Fita "${item.nome}" atualizada! Salve os dados.`, "success");
+            resetBordaForm();
+        } else {
+            const nome = getEl("novaBordaNome").value.trim();
+            if (!nome) return showToast("Nome é obrigatório.", "error");
+            const key = createKeyFromName(nome);
+            if (AppData.coresBorda[key]) return showToast("Fita de borda já existe.", "error");
+            const preco = parseFloat(getEl("novaBordaPrecoFinal").value);
+            if (isNaN(preco)) return showToast("Preço inválido.", "error");
+            AppData.coresBorda[key] = { nome, preco, imagem: currentImageUrl.material };
+            saveAppState();
+            popularTodosSeletores();
+            showToast(`"${nome}" adicionada! Salve os dados.`, "success");
+            resetBordaForm();
+        }
+    });
+    const calcularPrecoBordaTab = () => {
+        const precoRolo = parseFloat(getEl("novaBordaPrecoRolo").value),
+            metragemRolo = parseFloat(getEl("novaBordaMetragemRolo").value),
+            campoFinal = getEl("novaBordaPrecoFinal");
+        if (!isNaN(precoRolo) && !isNaN(metragemRolo) && metragemRolo > 0)
+            campoFinal.value = (precoRolo / metragemRolo).toFixed(2);
+    };
+    getEl("novaBordaPrecoRolo").addEventListener("input", calcularPrecoBordaTab);
+    getEl("novaBordaMetragemRolo").addEventListener("input", calcularPrecoBordaTab);
+    getEl("novaBordaPrecoFinal").addEventListener("input", () => {
+        getEl("novaBordaPrecoRolo").value = "";
+        getEl("novaBordaMetragemRolo").value = "";
+    });
     const calcularPrecoMetroBorda = () => {
         const precoRolo = parseFloat(getEl("novoMaterialPrecoRoloBorda").value),
             metragemRolo = parseFloat(getEl("novoMaterialMetragemRoloBorda").value),
@@ -2379,7 +2465,7 @@ async function inicializarApp() {
             if (imageUrl) {
                 preview.src = imageUrl;
                 if (form.querySelector("#nomeModulo")) imagemModuloUrl = imageUrl;
-                if (form.querySelector("#novoMaterialNome")) currentImageUrl.material = imageUrl;
+                if (form.querySelector("#novoMaterialNome") || form.querySelector("#novaBordaNome")) currentImageUrl.material = imageUrl;
                 if (form.querySelector("#novaFerragemNome")) currentImageUrl.hardware = imageUrl;
                 if (form.querySelector("#novoPerfilNome")) currentImageUrl.profile = imageUrl;
             } else {

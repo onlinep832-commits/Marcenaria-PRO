@@ -1,13 +1,26 @@
-const CACHE_NAME = 'marcenaria-pro-v1';
+const CACHE_NAME = 'marcenaria-pro-v2';
 
 // Lista de arquivos para salvar no cache
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './styles.css',
-  './script.js',
   './dados.json',
   './manifest.json',
+  // Módulos da aplicação
+  './js/state.js',
+  './js/utils.js',
+  './js/data.js',
+  './js/ui-catalog.js',
+  './js/modules.js',
+  './js/project.js',
+  './js/catalog-forms.js',
+  './js/calculation.js',
+  './js/export.js',
+  './js/plano-corte.js',
+  './js/clients.js',
+  './js/events.js',
+  './js/main.js',
   // Bibliotecas Externas (garantem que o PDF e Excel funcionem offline)
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js',

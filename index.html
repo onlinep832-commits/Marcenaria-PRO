@@ -1,10 +1,26 @@
-><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="google-adsense-account" content="ca-pub-7068124591666531" />
         <title>Marcenaria PRO - Listagem e Orçamento (Design 2026)</title>
+
+        <!-- Open Graph / Compartilhamento em redes sociais -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://marcenaria-earts.netlify.app/" />
+        <meta property="og:title" content="Marcenaria PRO - Listagem e Orçamento" />
+        <meta property="og:description" content="Sistema profissional de listagem de materiais e orçamento para marcenaria. Monte projetos, gere listas de corte e orçamentos completos." />
+        <meta property="og:image" content="https://marcenaria-earts.netlify.app/icon.png" />
+        <meta property="og:image:width" content="1024" />
+        <meta property="og:image:height" content="1024" />
+        <meta property="og:locale" content="pt_BR" />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Marcenaria PRO - Listagem e Orçamento" />
+        <meta name="twitter:description" content="Sistema profissional de listagem de materiais e orçamento para marcenaria." />
+        <meta name="twitter:image" content="https://marcenaria-earts.netlify.app/icon.png" />
 
         <!-- CONFIGURAÇÃO PWA (Adicionado) -->
         <link rel="manifest" href="manifest.json">
@@ -28,146 +44,274 @@
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <div id="toast-container"></div>
-        <header>
-            <h1>Marcenaria PRO</h1>
-            <p>Sistema de Listagem e Orçamento Automático</p>
-        </header>
+        <!-- ═══ VERIFICAÇÃO DE ACESSO — não remover ═══ -->
+        <script>
+        (function(){
+            var CLIENT_SESSION = "marcenaria_pro_logged";
+            var ADMIN_SESSION  = "marcenaria_pro_admin";
+            var LOGIN_URL      = "../login/index.html";
+            try {
+                if (sessionStorage.getItem(ADMIN_SESSION) === "true") return;
+                if (sessionStorage.getItem(CLIENT_SESSION) === "true") return;
+                window.location.replace(LOGIN_URL);
+            } catch(e) { window.location.replace(LOGIN_URL); }
+        })();
+        </script>
+        <!-- ══════════════════════════════════════════════ -->
 
-        <main>
-            <!-- NAVEGAÇÃO PRINCIPAL -->
-            <nav class="card">
-                <div class="botoes-acao" style="margin-top: 0; justify-content: center">
-                    <button id="btnNavProjeto" class="btn-primary">Montagem do Projeto</button>
-                    <button id="btnNavGerenciarModulos" class="btn-warning">Gerenciar Módulos</button>
-                    <button id="btnNavGerenciarCatalogos" class="btn-secondary">Gerenciar Catálogos</button>
-                    <button id="btnNavVisualizarCatalogo" class="btn-secondary">Visualizar Catálogo</button>
-                    <button id="btnNavConfig" class="btn-secondary">⚙️ Configurações</button>
-                    <button id="btnNavDados" class="btn-secondary">Dados Locais</button>
-                </div>
-            </nav>
+        <div id="app-shell">
+
+        <!-- BARRA DE TÍTULO -->
+        <div id="titlebar">
+            <button id="btnMenuToggle" class="menu-toggle-btn" title="Menu">
+                <span></span><span></span><span></span>
+            </button>
+            <span class="app-icon">🪵</span>
+            <span class="app-title">Marcenaria PRO</span>
+            <span class="app-subtitle">— Listagem e Orçamento</span>
+            <div class="titlebar-spacer"></div>
+            <button id="btnLogout" class="btn-logout-titlebar" title="Sair do sistema" onclick="marcenariaSair()" style="display:none">
+                🔓 Sair
+            </button>
+        </div>
+        <div id="sidebar-overlay" onclick="fecharSidebar()"></div>
+
+        <!-- BARRA LATERAL -->
+        <nav id="sidebar">
+            <span class="sidebar-section-label">Projeto</span>
+            <button id="btnNavProjeto" class="nav-btn active">
+                <span class="nav-icon">📋</span> Montagem do Projeto
+            </button>
+
+            <hr class="sidebar-divider">
+            <span class="sidebar-section-label">Módulos e Catálogos</span>
+
+            <button id="btnNavGerenciarModulos" class="nav-btn">
+                <span class="nav-icon">🗂️</span> Gerenciar Módulos
+            </button>
+            <button id="btnNavGerenciarCatalogos" class="nav-btn">
+                <span class="nav-icon">📦</span> Gerenciar Catálogos
+            </button>
+            <button id="btnNavVisualizarCatalogo" class="nav-btn">
+                <span class="nav-icon">👁️</span> Visualizar Catálogo
+            </button>
+
+            <hr class="sidebar-divider">
+            <span class="sidebar-section-label">Clientes</span>
+            <button id="btnNavClientes" class="nav-btn">
+                <span class="nav-icon">👥</span> Clientes Salvos
+            </button>
+            <button id="btnNavAcesso" class="nav-btn">
+                <span class="nav-icon">🔐</span> Acesso de Clientes
+            </button>
+
+            <hr class="sidebar-divider">
+            <span class="sidebar-section-label">Sistema</span>
+
+            <button id="btnNavPlanoCort" class="nav-btn">
+                <span class="nav-icon">✂️</span> Plano de Corte
+            </button>
+
+            <button id="btnNavConfig" class="nav-btn">
+                <span class="nav-icon">⚙️</span> Configurações
+            </button>
+            <button id="btnNavDados" class="nav-btn">
+                <span class="nav-icon">💾</span> Dados Locais
+            </button>
+
+            <hr class="sidebar-divider">
+        </nav>
+
+        <!-- ÁREA DE CONTEÚDO -->
+        <main id="content-area">
 
             <!-- TELA: MONTAGEM DO PROJETO (PRINCIPAL) -->
             <div id="view-projeto" class="app-view">
-                <section class="card">
-                    <h2><span class="step-number">1</span>Montagem do Projeto</h2>
-                    <p>Defina as dimensões e cores do projeto, depois adicione os módulos e ferragens extras que desejar.</p>
-                    <h3>Dados Gerais</h3>
-                    <div class="form-grid">
-                        <input type="text" id="nomeCliente" placeholder="Nome do Cliente (para o PDF)" />
-                        <input type="text" id="nomeAmbiente" placeholder="Ambiente (Ex: Cozinha, Quarto Casal)" />
-                        <div class="form-group">
-                            <label>Cor Material Interno</label>
-                            <select id="projCorInterna"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Cor Material Externo</label>
-                            <select id="projCorExterna"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Cor da Borda Interna (Projeto)</label>
-                            <select id="projCorBordaInterna"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Cor da Borda Externa (Projeto)</label>
-                            <select id="projCorBordaExterna"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Perfil de Alumínio Padrão (para o Projeto)</label>
-                            <select id="projPerfilAluminio"></select>
-                        </div>
-                    </div>
 
-                    <hr style="margin: 25px 0; border-color: var(--cor-borda)" />
-                    <h3>Adicionar Módulos e Peças</h3>
-                    <div class="form-grid" style="grid-template-columns: 1fr 200px; align-items: flex-end">
-                        <div class="form-group" style="margin: 0">
-                            <label for="tipoModuloProjeto" id="labelTipoModuloProjeto">Tipo de Módulo a Adicionar</label>
-                            <select id="tipoModuloProjeto">
-                                <option value="reto">Módulo Reto</option>
-                                <option value="canto">Módulo de Canto (em L)</option>
-                            </select>
-                        </div>
-                        <div></div>
-                    </div>
-                    <div id="dimensoes-container-reto">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="projAltura" id="labelProjAltura">Altura Final (A) em mm</label>
-                                <input type="number" id="projAltura" placeholder="Altura Final (A) em mm" />
-                            </div>
-                            <div class="form-group">
-                                <label for="projLargura" id="labelProjLargura">Largura Final (L) em mm</label>
-                                <input type="number" id="projLargura" placeholder="Largura Final (L) em mm" />
-                            </div>
-                            <div class="form-group">
-                                <label for="projProfundidade" id="labelProjProfundidade">Profundidade Final (P) em mm</label>
-                                <input type="number" id="projProfundidade" placeholder="Profundidade Final (P) em mm" />
-                            </div>
-                        </div>
-                    </div>
-                    <div id="dimensoes-container-canto" style="display: none">
-                        <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))">
-                            <input type="number" id="projAlturaCanto" placeholder="Altura (A) em mm" />
-                            <input type="number" id="projLadoA" placeholder="Lado A (mm)" />
-                            <input type="number" id="projLadoB" placeholder="Lado B (mm)" />
-                            <input type="number" id="projProfA" placeholder="Profundidade A (mm)" />
-                            <input type="number" id="projProfB" placeholder="Profundidade B (mm)" />
-                        </div>
-                    </div>
+                <!-- Linha 1: Dados do Cliente + Cores e Materiais -->
+                <div class="proj-top-grid">
 
-                    <div class="seletor-com-preview">
-                        <div style="flex-grow: 1">
-                            <div class="form-grid" style="margin-top: 0; gap: 15px; grid-template-columns: 2fr 1.5fr">
-                                <div class="form-group" style="margin-bottom: 0">
-                                    <label>Escolha um Módulo ou Peça</label>
-                                    <div style="display: flex; gap: 10px">
-                                        <div id="displayModuloSelecionado" data-value="">-- Selecione um item --</div>
-                                        <button id="btnAbrirSelecaoModulo" class="btn-primary" style="flex-shrink: 0">Selecionar</button>
+                    <!-- Painel: Dados do Cliente -->
+                    <section class="card proj-panel proj-panel--cliente">
+                        <div class="proj-panel-header">
+                            <span class="proj-icon-badge">👤</span>
+                            <div>
+                                <div class="proj-panel-title">Dados do Cliente</div>
+                                <div class="proj-panel-desc">Identificação do projeto</div>
+                            </div>
+                        </div>
+                        <div class="form-grid" style="grid-template-columns: 1fr; gap: 8px; margin-top: 0">
+                            <input type="text" id="nomeCliente" placeholder="Nome do Cliente (para o PDF)" />
+                            <input type="text" id="nomeAmbiente" placeholder="Ambiente (Ex: Cozinha, Quarto Casal)" />
+                        </div>
+                    </section>
+
+                    <!-- Painel: Cores e Materiais -->
+                    <section class="card proj-panel proj-panel--cores">
+                        <div class="proj-panel-header">
+                            <span class="proj-icon-badge">🎨</span>
+                            <div>
+                                <div class="proj-panel-title">Cores e Materiais</div>
+                                <div class="proj-panel-desc">Padrões visuais do projeto</div>
+                            </div>
+                        </div>
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0">
+                            <div class="form-group">
+                                <label>Material Interno</label>
+                                <select id="projCorInterna"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Material Externo</label>
+                                <select id="projCorExterna"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Borda Interna</label>
+                                <select id="projCorBordaInterna"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Borda Externa</label>
+                                <select id="projCorBordaExterna"></select>
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1">
+                                <label>Perfil de Alumínio Padrão</label>
+                                <select id="projPerfilAluminio"></select>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+
+                <!-- Painel: Adicionar Módulo -->
+                <section class="card proj-panel proj-panel--modulo">
+                    <div class="proj-panel-header">
+                        <span class="proj-icon-badge">📦</span>
+                        <div>
+                            <div class="proj-panel-title">Adicionar Módulo ao Projeto</div>
+                            <div class="proj-panel-desc">Selecione o módulo, defina dimensões e adicione</div>
+                        </div>
+                    </div>
+                    <div class="proj-modulo-grid">
+
+                        <!-- Col esquerda: tipo + dimensões -->
+                        <div class="proj-modulo-col">
+                            <div class="proj-col-label">Tipo e Dimensões</div>
+                            <div class="form-group" style="margin-top: 8px">
+                                <label for="tipoModuloProjeto" id="labelTipoModuloProjeto">Tipo de Módulo</label>
+                                <select id="tipoModuloProjeto">
+                                    <option value="reto">Módulo Reto</option>
+                                    <option value="canto">Módulo de Canto (em L)</option>
+                                </select>
+                            </div>
+                            <div id="dimensoes-container-reto">
+                                <div class="form-grid" style="grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 8px">
+                                    <div class="form-group">
+                                        <label id="labelProjAltura">Altura (mm)</label>
+                                        <input type="number" id="projAltura" placeholder="Ex: 720" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label id="labelProjLargura">Largura (mm)</label>
+                                        <input type="number" id="projLargura" placeholder="Ex: 600" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label id="labelProjProfundidade">Prof. (mm)</label>
+                                        <input type="number" id="projProfundidade" placeholder="Ex: 550" />
                                     </div>
                                 </div>
-                                <div class="form-group" style="margin-bottom: 0">
-                                    <label for="moduloTipoPuxador">Tipo de Puxador</label>
-                                    <select id="moduloTipoPuxador">
-                                        <option value="externo">Puxador Externo (Padrão)</option>
-                                        <option value="cava_horizontal">Puxador Cava (Horizontal)</option>
-                                        <option value="cava_vertical">Puxador Cava (Vertical)</option>
-                                        <option value="perfil_horizontal">Puxador Perfil de Alumínio (Horizontal)</option>
-                                        <option value="perfil_vertical">Puxador Perfil de Alumínio (Vertical)</option>
-                                    </select>
+                            </div>
+                            <div id="dimensoes-container-canto" style="display: none">
+                                <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(100px,1fr)); gap: 8px; margin-top: 8px">
+                                    <input type="number" id="projAlturaCanto" placeholder="Altura (mm)" />
+                                    <input type="number" id="projLadoA" placeholder="Lado A (mm)" />
+                                    <input type="number" id="projLadoB" placeholder="Lado B (mm)" />
+                                    <input type="number" id="projProfA" placeholder="Prof. A (mm)" />
+                                    <input type="number" id="projProfB" placeholder="Prof. B (mm)" />
                                 </div>
                             </div>
-                            <div class="botoes-acao" style="margin-top: 15px; align-items: flex-end">
-                                <div class="form-group" style="flex: 0 1 120px; margin-bottom: 0">
-                                    <label for="quantidadeModuloProjeto">Quantidade</label>
-                                    <input type="number" id="quantidadeModuloProjeto" value="1" min="1" style="text-align: center" />
-                                </div>
-                                <button type="button" id="btnAdicionarModulo" class="btn-primary" style="flex-grow: 1">Adicionar ao Projeto</button>
-                            </div>
                         </div>
-                        <div style="text-align: center">
-                            <label>Preview</label>
-                            <img id="imagemModuloPreviewProjeto" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview do módulo selecionado" />
-                        </div>
-                    </div>
 
-                    <h3>Ferragens Extras</h3>
-                    <div class="botoes-acao">
-                        <select id="ferragensExtrasSelect">
-                            <option value="">-- Escolha do catálogo --</option>
-                        </select>
-                        <input type="number" id="ferragemExtraValor" placeholder="Qtd ou Medida" /><button type="button" id="btnAdicionarFerragemExtra" class="btn-primary">Adicionar Ferragem Extra</button>
-                    </div>
-                    <div id="resumo-projeto-container" style="display: none">
-                        <h3>Resumo do Projeto Atual</h3>
-                        <div class="resumo-projeto"><ul id="lista-resumo-projeto"></ul></div>
+                        <!-- Col direita: seleção + preview + puxador + botão -->
+                        <div class="proj-modulo-col">
+                            <div class="proj-col-label">Seleção e Configuração</div>
+                            <div class="seletor-com-preview" style="margin-top: 8px; align-items: flex-start">
+                                <div style="flex-grow:1; display:flex; flex-direction:column; gap:8px">
+                                    <div class="form-group" style="margin:0">
+                                        <label>Módulo ou Peça</label>
+                                        <div style="display:flex; gap:7px">
+                                            <div id="displayModuloSelecionado" data-value="">-- Selecione um item --</div>
+                                            <button id="btnAbrirSelecaoModulo" class="btn-primary" style="flex-shrink:0">Selecionar</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin:0">
+                                        <label for="moduloTipoPuxador">Tipo de Puxador</label>
+                                        <select id="moduloTipoPuxador">
+                                            <option value="externo">Puxador Externo (Padrão)</option>
+                                            <option value="cava_horizontal">Puxador Cava (Horizontal)</option>
+                                            <option value="cava_vertical">Puxador Cava (Vertical)</option>
+                                            <option value="perfil_horizontal">Puxador Perfil de Alumínio (Horizontal)</option>
+                                            <option value="perfil_vertical">Puxador Perfil de Alumínio (Vertical)</option>
+                                        </select>
+                                    </div>
+                                    <div class="botoes-acao" style="margin:0; align-items:flex-end">
+                                        <div class="form-group" style="flex:0 1 90px; margin:0">
+                                            <label for="quantidadeModuloProjeto">Qtd</label>
+                                            <input type="number" id="quantidadeModuloProjeto" value="1" min="1" style="text-align:center" />
+                                        </div>
+                                        <button type="button" id="btnAdicionarModulo" class="btn-primary proj-btn-add">＋ Adicionar ao Projeto</button>
+                                    </div>
+                                </div>
+                                <div class="proj-preview-box">
+                                    <span class="proj-preview-label">Preview</span>
+                                    <img id="imagemModuloPreviewProjeto" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview do módulo selecionado" />
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </section>
 
-                <section class="card">
-                    <h2><span class="step-number">2</span>Gerar Listagem e Orçamento</h2>
-                    <div class="botoes-acao">
-                        <button type="button" id="btnGerarListagem" class="btn-success" style="flex-grow: 1; padding: 15px; font-size: 1.2rem">Gerar Listagem Completa</button>
+                <!-- Painel: Ferragens Extras -->
+                <section class="card proj-panel proj-panel--ferragens">
+                    <div class="proj-panel-header">
+                        <span class="proj-icon-badge">🔩</span>
+                        <div>
+                            <div class="proj-panel-title">Ferragens Extras</div>
+                            <div class="proj-panel-desc">Itens avulsos além dos módulos</div>
+                        </div>
+                    </div>
+                    <div class="botoes-acao" style="margin-top: 10px">
+                        <select id="ferragensExtrasSelect" style="flex:1; min-width:0">
+                            <option value="">-- Escolha do catálogo --</option>
+                        </select>
+                        <input type="number" id="ferragemExtraValor" placeholder="Qtd / Medida" style="max-width:120px" />
+                        <button type="button" id="btnAdicionarFerragemExtra" class="btn-primary">＋ Adicionar</button>
+                    </div>
+                </section>
+
+                <!-- Resumo do Projeto (aparece após adicionar módulos) -->
+                <div id="resumo-projeto-container" style="display:none">
+                    <section class="card proj-panel proj-panel--resumo">
+                        <div class="proj-panel-header">
+                            <span class="proj-icon-badge">📋</span>
+                            <div>
+                                <div class="proj-panel-title">Resumo do Projeto</div>
+                                <div class="proj-panel-desc">Módulos e itens adicionados</div>
+                            </div>
+                        </div>
+                        <div class="resumo-projeto" style="margin-top:10px"><ul id="lista-resumo-projeto"></ul></div>
+                    </section>
+                </div>
+
+                <!-- Action bar: Gerar Listagem -->
+                <section class="proj-action-bar">
+                    <div class="proj-action-bar-content">
+                        <div class="proj-action-info">
+                            <div class="proj-action-title">Gerar Listagem e Orçamento</div>
+                            <div class="proj-action-desc">Processa os módulos e gera PDF, Excel e Plano de Corte</div>
+                        </div>
+                        <div class="botoes-acao" style="margin:0; flex-shrink:0">
+                            <button type="button" id="btnSalvarProjetoCliente" class="btn-secondary proj-btn-salvar">💾 Salvar</button>
+                            <button type="button" id="btnGerarListagem" class="btn-success proj-btn-gerar">⚡ Gerar Listagem</button>
+                        </div>
                     </div>
                 </section>
 
@@ -229,12 +373,65 @@
                         <h3 id="orcamento-total"></h3>
                     </div>
 
-                    <div class="botoes-export botoes-acao">
-                        <button id="btnExportarProducao" class="btn-secondary">Exportar PDF (Produção)</button>
-                        <button id="btnExportarExcel" class="btn-secondary">Exportar Excel (Plano de Corte)</button>
-                        <button id="btnGerarPreContrato" class="btn-success">Gerar PDF (Enviar p/ Cliente)</button>
-                        <button id="btnExportarCortcloud" class="btn-warning">Exportar para Cortcloud</button>
+                    <!-- ===== PAINEL DE EXPORTAÇÃO ===== -->
+                    <div class="export-panel">
+                        <div class="export-panel-hdr">
+                            <span class="export-panel-hdr-title">📤 Exportar Projeto</span>
+                            <span class="export-panel-hdr-line"></span>
+                        </div>
+
+                        <div class="export-group-label">🏭 Uso Interno / Produção</div>
+                        <div class="export-btn-grid">
+                            <button id="btnExportarProducao" class="export-btn export-btn--producao">
+                                <span class="export-btn-icon">📄</span>
+                                <span class="export-btn-body">
+                                    <span class="export-btn-name">PDF Produção</span>
+                                    <span class="export-btn-desc">Lista de corte + ferragens</span>
+                                </span>
+                            </button>
+                            <button id="btnExportarExcel" class="export-btn export-btn--excel">
+                                <span class="export-btn-icon">📊</span>
+                                <span class="export-btn-body">
+                                    <span class="export-btn-name">Exportar Excel</span>
+                                    <span class="export-btn-desc">Planilha editável (.xlsx)</span>
+                                </span>
+                            </button>
+                            <button id="btnAbrirPlanoCort" class="export-btn export-btn--corte" onclick="abrirPlanoCorteDaListagem()">
+                                <span class="export-btn-icon">✂️</span>
+                                <span class="export-btn-body">
+                                    <span class="export-btn-name">Plano de Corte</span>
+                                    <span class="export-btn-desc">Otimização de chapas CNC</span>
+                                </span>
+                            </button>
+                            <button id="btnExportarCortcloud" class="export-btn export-btn--cortcloud">
+                                <span class="export-btn-icon">☁️</span>
+                                <span class="export-btn-body">
+                                    <span class="export-btn-name">Cortcloud</span>
+                                    <span class="export-btn-desc">Envio direto ao software</span>
+                                </span>
+                            </button>
+                        </div>
+
+                        <div class="export-group-label" style="margin-top:14px;">👤 Para o Cliente</div>
+                        <div class="export-btn-grid">
+                            <button id="btnGerarPreContrato" class="export-btn export-btn--cliente">
+                                <span class="export-btn-icon">📋</span>
+                                <span class="export-btn-body">
+                                    <span class="export-btn-name">PDF Cliente</span>
+                                    <span class="export-btn-desc">Pré-contrato / orçamento</span>
+                                </span>
+                            </button>
+                        </div>
                     </div>
+                </section>
+            </div>
+
+            <!-- TELA: CLIENTES SALVOS -->
+            <div id="view-clientes" class="app-view" style="display: none">
+                <section class="card" style="border-top: 4px solid #2563eb">
+                    <h2>👥 Clientes Salvos</h2>
+                    <p>Seus projetos salvos por cliente. Monte o projeto na aba <strong>Montagem do Projeto</strong> e clique em <strong>"💾 Salvar Projeto do Cliente"</strong> para registrar aqui.</p>
+                    <div id="lista-clientes-salvos" style="margin-top: 16px"></div>
                 </section>
             </div>
 
@@ -352,24 +549,24 @@
             <div id="view-gerenciar-catalogos" class="app-view" style="display: none">
                 <div class="card">
                     <div class="view-header">
-                        <h2>Gerenciar Catálogos</h2>
+                        <h2>📦 Gerenciar Catálogos</h2>
                         <input type="search" id="filtroCatalogo" class="filtro-view" placeholder="Filtrar itens do catálogo..." />
                     </div>
-                    <div class="view-body">
-                        <h3>Catálogo de Materiais</h3>
-                        <div class="form-grid" style="grid-template-columns: 1fr 1fr">
-                            <div>
-                                <h4>Cores de MDF</h4>
-                                <div id="listaCoresMDF" class="catalogo-gerenciador"></div>
-                            </div>
-                            <div>
-                                <h4>Cores de Fita de Borda</h4>
-                                <div id="listaCoresBorda" class="catalogo-gerenciador"></div>
-                            </div>
-                        </div>
 
-                        <fieldset style="border: 1px solid var(--cor-borda); border-radius: 8px; padding: 15px; margin-top: 20px">
-                            <legend id="material-form-titulo" style="font-weight: 500; padding: 0 10px">Adicionar Novo Material</legend>
+                    <!-- Navegação por abas -->
+                    <nav class="cat-tab-nav">
+                        <button class="cat-tab-btn active" data-tab="cat-mdf" onclick="switchCatTab('cat-mdf')">🪵 Cores de MDF</button>
+                        <button class="cat-tab-btn" data-tab="cat-borda" onclick="switchCatTab('cat-borda')">🎨 Fita de Borda</button>
+                        <button class="cat-tab-btn" data-tab="cat-perfil" onclick="switchCatTab('cat-perfil')">📐 Perfis de Puxador</button>
+                        <button class="cat-tab-btn" data-tab="cat-ferragem" onclick="switchCatTab('cat-ferragem')">🔩 Ferragens</button>
+                        <button class="cat-tab-btn" data-tab="cat-peca" onclick="switchCatTab('cat-peca')">📦 Peças Padrão</button>
+                    </nav>
+
+                    <!-- ABA 1: Cores de MDF -->
+                    <div class="cat-tab-pane active" id="cat-mdf">
+                        <div id="listaCoresMDF" class="catalogo-gerenciador"></div>
+                        <fieldset style="border: 1px solid var(--cor-borda); border-radius: 8px; padding: 15px; margin-top: 16px">
+                            <legend id="material-form-titulo" style="font-weight: 500; padding: 0 10px">Adicionar Novo MDF</legend>
                             <div class="form-grid" style="grid-template-columns: 1fr 2fr 150px; align-items: flex-end">
                                 <div class="form-group">
                                     <label>Tipo de Material</label>
@@ -397,18 +594,45 @@
                                 </div>
                                 <div class="form-group"><label>Preço Final por Metro (R$/m)</label><input type="number" id="novoMaterialPrecoFinalBorda" placeholder="2.50" step="0.01" /></div>
                             </div>
-
                             <div class="botoes-acao" style="margin-top: 10px; justify-content: flex-start">
                                 <button id="btnAddMaterial" class="btn-primary">Adicionar ao Catálogo</button>
                                 <button id="btnCancelarEdicaoMaterial" class="btn-secondary" style="display: none">Cancelar Edição</button>
                             </div>
                         </fieldset>
+                    </div>
 
-                        <hr style="margin: 25px 0; border-color: var(--cor-borda)" />
+                    <!-- ABA 2: Fita de Borda -->
+                    <div class="cat-tab-pane" id="cat-borda">
+                        <div id="listaCoresBorda" class="catalogo-gerenciador"></div>
+                        <fieldset style="border: 1px solid var(--cor-borda); border-radius: 8px; padding: 15px; margin-top: 16px">
+                            <legend id="borda-form-titulo" style="font-weight: 500; padding: 0 10px">Adicionar Nova Fita de Borda</legend>
+                            <div class="form-grid" style="grid-template-columns: 2fr 150px; align-items: flex-end">
+                                <div class="form-group"><label>Nome</label><input type="text" id="novaBordaNome" placeholder="Ex: Branco TX" /></div>
+                                <div class="form-group">
+                                    <label>Imagem</label
+                                    ><img id="novaBordaPreview" class="item-preview" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" /><input type="file" class="imagem-input" style="display: none" accept="image/*" />
+                                </div>
+                            </div>
+                            <div class="form-grid" style="margin-top: 5px; grid-template-columns: 1fr 1fr 1fr">
+                                <div class="form-group">
+                                    <label>Preço do Rolo (R$) <small>(Opcional)</small></label><input type="number" id="novaBordaPrecoRolo" placeholder="50.00" step="0.01" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Metragem do Rolo (m) <small>(Opcional)</small></label><input type="number" id="novaBordaMetragemRolo" placeholder="20" step="1" />
+                                </div>
+                                <div class="form-group"><label>Preço Final por Metro (R$/m)</label><input type="number" id="novaBordaPrecoFinal" placeholder="2.50" step="0.01" /></div>
+                            </div>
+                            <div class="botoes-acao" style="margin-top: 10px; justify-content: flex-start">
+                                <button id="btnAddBorda" class="btn-primary">Adicionar ao Catálogo</button>
+                                <button id="btnCancelarEdicaoBorda" class="btn-secondary" style="display: none">Cancelar Edição</button>
+                            </div>
+                        </fieldset>
+                    </div>
 
-                        <h3>Catálogo de Perfis de Puxador</h3>
+                    <!-- ABA 3: Perfis de Puxador -->
+                    <div class="cat-tab-pane" id="cat-perfil">
                         <div id="listaPerfisPuxador" class="catalogo-gerenciador"></div>
-                        <fieldset style="border: 1px solid var(--cor-borda); border-radius: 8px; padding: 15px; margin-top: 20px">
+                        <fieldset style="border: 1px solid var(--cor-borda); border-radius: 8px; padding: 15px; margin-top: 16px">
                             <legend id="perfil-form-titulo" style="font-weight: 500; padding: 0 10px">Adicionar Novo Perfil</legend>
                             <div class="form-grid" style="grid-template-columns: 1fr 150px; align-items: flex-end">
                                 <div class="form-group"><label>Nome do Perfil</label><input type="text" id="novoPerfilNome" placeholder="Ex: Perfil Gola Alumínio Bronze" /></div>
@@ -435,12 +659,12 @@
                                 <button id="btnCancelarEdicaoPerfil" class="btn-secondary" style="display: none">Cancelar</button>
                             </div>
                         </fieldset>
+                    </div>
 
-                        <hr style="margin: 25px 0; border-color: var(--cor-borda)" />
-
-                        <h3>Catálogo de Ferragens (Geral)</h3>
+                    <!-- ABA 4: Ferragens -->
+                    <div class="cat-tab-pane" id="cat-ferragem">
                         <div id="listaFerragensCatalogo" class="catalogo-gerenciador"></div>
-                        <fieldset style="border: 1px solid var(--cor-borda); border-radius: 8px; padding: 15px; margin-top: 20px">
+                        <fieldset style="border: 1px solid var(--cor-borda); border-radius: 8px; padding: 15px; margin-top: 16px">
                             <legend id="ferragem-form-titulo" style="font-weight: 500; padding: 0 10px">Adicionar Nova Ferragem</legend>
                             <div class="form-grid" style="grid-template-columns: 1fr 150px; align-items: flex-end">
                                 <div class="form-group"><label>Nome</label><input type="text" id="novaFerragemNome" placeholder="Ex: Dobradiça Reta 35mm" /></div>
@@ -486,11 +710,12 @@
                                 <button id="btnCancelarEdicaoFerragem" class="btn-secondary" style="display: none">Cancelar</button>
                             </div>
                         </fieldset>
+                    </div>
 
-                        <hr style="margin: 25px 0; border-color: var(--cor-borda)" />
-                        <h3>Catálogo de Peças Padrão</h3>
+                    <!-- ABA 5: Peças Padrão -->
+                    <div class="cat-tab-pane" id="cat-peca">
                         <div id="listaPecasPredefinidas" class="catalogo-gerenciador"></div>
-                        <fieldset id="nova-peca-form-wrapper" style="border: 1px solid var(--cor-borda); border-radius: 8px; padding: 15px; margin-top: 20px">
+                        <fieldset id="nova-peca-form-wrapper" style="border: 1px solid var(--cor-borda); border-radius: 8px; padding: 15px; margin-top: 16px">
                             <legend id="peca-form-titulo" style="font-weight: 500; padding: 0 10px">Nova Peça Padrão</legend>
                             <div class="form-grid">
                                 <div class="form-group"><label>Nome</label><input type="text" id="novaPecaNome" placeholder="Ex: Divisória Vertical" /></div>
@@ -518,6 +743,7 @@
                             </div>
                         </fieldset>
                     </div>
+
                     <div class="view-footer"><button class="btn-secondary btn-voltar">Voltar</button></div>
                 </div>
             </div>
@@ -617,7 +843,212 @@
                     <div class="view-footer"><button id="btnSalvarConfig" class="btn-success">Salvar e Voltar</button></div>
                 </div>
             </div>
+
+            <!-- TELA: ACESSO DE CLIENTES (ADMINISTRAÇÃO) -->
+            <div id="view-acesso-clientes" class="app-view" style="display: none">
+                <div class="card">
+                    <div class="view-header">
+                        <h2>🔐 Controle de Acesso de Clientes</h2>
+                    </div>
+                    <div class="view-body">
+
+                        <!-- Formulário de cadastro -->
+                        <div class="acesso-add-box">
+                            <h3 class="acesso-add-titulo">➕ Cadastrar Novo Acesso</h3>
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                                <div class="form-group">
+                                    <label>Nome do Cliente</label>
+                                    <input type="text" id="acessoNome" placeholder="Ex: João Silva" autocomplete="off" />
+                                </div>
+                                <div class="form-group">
+                                    <label>E-mail</label>
+                                    <input type="email" id="acessoEmail" placeholder="joao@email.com" autocomplete="off" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Senha</label>
+                                    <input type="text" id="acessoSenha" placeholder="Crie uma senha" autocomplete="off" />
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:12px; align-items:center; flex-wrap:wrap;">
+                                <button class="btn-success" onclick="adicionarClienteAcesso()">💾 Salvar e Liberar Acesso</button>
+                                <span id="acessoAddStatus" style="font-size:13px; font-weight:600;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Lista de clientes -->
+                        <div style="margin-top:24px;">
+                            <h3 style="font-size:14px; font-weight:700; color:var(--cor-texto); margin-bottom:12px;">
+                                👥 Clientes com Acesso Cadastrado
+                            </h3>
+                            <div id="lista-acesso-clientes">
+                                <p style="color:var(--cor-texto-suave); font-size:13px;">Nenhum cliente cadastrado ainda.</p>
+                            </div>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="acesso-info-box" style="margin-top:20px;">
+                            <strong>💡 Como funciona:</strong> Cada cliente recebe e-mail e senha únicos.
+                            Você pode <span style="color:var(--cor-perigo);font-weight:700;">Bloquear</span> temporariamente ou
+                            <span style="color:var(--cor-perigo);font-weight:700;">Excluir</span> permanentemente o acesso de qualquer cliente.
+                            O sistema só exige login quando há pelo menos 1 cliente cadastrado.
+                        </div>
+
+                        <!-- Senha do Administrador -->
+                        <div class="acesso-admin-senha-box" style="margin-top:28px;">
+                            <h3 class="acesso-add-titulo">🔧 Sua Senha de Administrador</h3>
+                            <p style="font-size:13px; color:var(--cor-texto-suave); margin-bottom:14px;">
+                                Use a pasta <strong>admin/</strong> para entrar no sistema como administrador.
+                                Defina uma senha abaixo para proteger esse acesso.
+                                <br><em style="font-size:12px; color:#94a3b8;">Se nenhuma senha estiver definida, o acesso admin é livre.</em>
+                            </p>
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; max-width:500px;">
+                                <div class="form-group">
+                                    <label>Nova Senha</label>
+                                    <input type="password" id="adminNovaSenha" placeholder="Mín. 4 caracteres" maxlength="50" autocomplete="new-password" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirmar Senha</label>
+                                    <input type="password" id="adminConfirmarSenha" placeholder="Repita a senha" maxlength="50" autocomplete="new-password" />
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:12px; align-items:center; flex-wrap:wrap;">
+                                <button class="btn-primary" onclick="salvarSenhaAdmin()">💾 Salvar Senha de Admin</button>
+                                <button class="btn-secondary" onclick="removerSenhaAdmin()" style="font-size:12px;">🗑️ Remover senha (acesso livre)</button>
+                                <span id="adminSenhaStatus" style="font-size:13px; font-weight:600;"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- TELA: PLANO DE CORTE -->
+            <div id="view-plano-corte" class="app-view" style="display: none">
+                <section class="card">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                        <h2 style="margin:0">✂️ Plano de Corte</h2>
+                        <div class="botoes-acao" style="margin-top:0">
+                            <button class="btn-secondary btn-sm" onclick="corteAbrirGerenciador()">⚙️ Configurar Chapas</button>
+                            <button class="btn-primary" onclick="corteGerarPlano()">⚡ Gerar Plano Visual</button>
+                            <button class="btn-secondary btn-sm" onclick="corteImprimir()">🖨️ Imprimir</button>
+                            <button class="btn-secondary btn-sm" onclick="navigateTo('view-projeto')">← Voltar</button>
+                        </div>
+                    </div>
+                    <p style="margin-top:8px;">Peças carregadas automaticamente da listagem. Clique em <b>Gerar Plano Visual</b> para calcular o encaixe nas chapas.</p>
+                </section>
+
+                <!-- TABELA DE PEÇAS -->
+                <section class="card">
+                    <h2>Peças para Corte</h2>
+                    <div class="table-responsive">
+                        <table id="cortePiecesTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:36px">#</th>
+                                    <th>Material</th>
+                                    <th>Descrição</th>
+                                    <th style="text-align:center">Compr. (mm)</th>
+                                    <th style="text-align:center">Larg. (mm)</th>
+                                    <th style="text-align:center">Qtd</th>
+                                    <th style="text-align:center">Fitas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--cor-texto-suave);">Carregue a listagem e clique em "Abrir no Plano de Corte".</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- MAPA DE CORTE VISUAL -->
+                <section class="card">
+                    <h2>Mapa de Corte</h2>
+                    <div id="corte-visual-area">
+                        <div style="text-align:center;padding:40px;color:var(--cor-texto-suave);">
+                            <div style="font-size:2.5rem;margin-bottom:12px;">📐</div>
+                            <p>Clique em <b>Gerar Plano Visual</b> para ver o mapa de encaixe nas chapas.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </main>
+
+        <!-- MODAL: CONFIGURAR CHAPAS DO PLANO DE CORTE -->
+        <div id="modal-corte-specs" class="modal-overlay">
+            <div class="modal-content" style="max-width:820px">
+                <div class="modal-header">
+                    <h2>⚙️ Configurar Chapas por Material</h2>
+                    <button class="modal-close" onclick="corteFecharGerenciador()">×</button>
+                </div>
+                <!-- Formulário de adição -->
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;padding:14px 0 16px;border-bottom:1px solid var(--cor-borda);margin-bottom:14px;">
+                    <div class="form-group" style="min-width:200px;flex-grow:1">
+                        <label>Nome do Material</label>
+                        <input type="text" id="corteNewMatName" placeholder="Ex: MDF 18mm Branco TX">
+                    </div>
+                    <div class="form-group">
+                        <label>Comp. (mm)</label>
+                        <input type="number" id="corteNewL" value="2750" style="width:90px">
+                    </div>
+                    <div class="form-group">
+                        <label>Larg. (mm)</label>
+                        <input type="number" id="corteNewW" value="1850" style="width:90px">
+                    </div>
+                    <div class="form-group">
+                        <label>Serra (mm)</label>
+                        <input type="number" id="corteNewKerf" value="3" style="width:70px">
+                    </div>
+                    <div class="form-group">
+                        <label>Refile (mm)</label>
+                        <input type="number" id="corteNewTrim" value="10" style="width:70px">
+                    </div>
+                    <div class="form-group">
+                        <label>Rotação</label>
+                        <select id="corteNewRot" style="width:130px">
+                            <option value="false">Não (Grão Fixo)</option>
+                            <option value="true">Sim (Livre)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cor (CSS)</label>
+                        <input type="text" id="corteNewColor" value="hsl(210,20%,88%)" style="width:140px">
+                    </div>
+                    <button class="btn-success" onclick="corteAddSpec()">+ Adicionar</button>
+                </div>
+                <!-- Tabela de materiais configurados -->
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th style="text-align:center">Comp.</th>
+                                <th style="text-align:center">Larg.</th>
+                                <th style="text-align:center">Serra</th>
+                                <th style="text-align:center">Refile</th>
+                                <th style="text-align:center">Rotação</th>
+                                <th style="text-align:center">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corteSpecsBody">
+                            <tr><td colspan="7" style="text-align:center;padding:16px;color:var(--cor-texto-suave);">Nenhum material configurado.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="font-size:11px;color:var(--cor-texto-suave);margin-top:10px;">
+                    💡 Se um material não estiver configurado aqui, o sistema usa padrão: 2750×1850mm, serra 3mm, refile 10mm.
+                </p>
+            </div>
+        </div>
+
+        <!-- STATUS BAR -->
+        <div id="statusbar">
+            <span>🪵 Marcenaria PRO</span>
+            <span>Sistema de Listagem e Orçamento</span>
+        </div>
+
+        </div><!-- /app-shell -->
+
+        <div id="toast-container"></div>
 
         <!-- MODAIS -->
 
@@ -632,6 +1063,27 @@
                 <div class="modal-body">
                     <div id="grid-selecao-modulos">
                         <!-- A grade será populada via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL CLIENTE DUPLICADO -->
+        <div id="modal-cliente-duplicado" class="modal-overlay">
+            <div class="modal-content" style="max-width: 420px">
+                <div class="modal-header">
+                    <h2>⚠️ Cliente já existe</h2>
+                    <button class="modal-close" data-modal-id="modal-cliente-duplicado">×</button>
+                </div>
+                <div class="modal-body" style="padding: 20px 16px">
+                    <p id="modal-dup-msg" style="font-size:13px; color: var(--cor-texto); margin-bottom:16px; line-height:1.5"></p>
+                    <div style="display:flex; flex-direction:column; gap:10px">
+                        <button id="modal-dup-substituir" class="btn-danger" style="height:38px; font-size:13px; font-weight:700">🔄 Substituir projeto existente</button>
+                        <div style="display:flex; gap:8px; align-items:center">
+                            <input type="text" id="modal-dup-novo-nome" class="form-control" placeholder="Novo nome (ex: João Silva 2)" style="flex:1; height:36px; font-size:13px" />
+                            <button id="modal-dup-salvar-novo" class="btn-success" style="height:36px; font-size:13px; white-space:nowrap; padding:0 14px">💾 Salvar com este nome</button>
+                        </div>
+                        <button class="btn-secondary modal-close" data-modal-id="modal-cliente-duplicado" style="height:34px; font-size:12px">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -741,8 +1193,20 @@
         <script src="dados.json"></script>
 
         <script type="application/json" id="dados-json"></script>
-        <!-- SCRIPT PRINCIPAL DA APLICAÇÃO -->
-        <script src="script.js"></script>
+        <!-- MÓDULOS DA APLICAÇÃO (ordem de dependência) -->
+        <script src="js/state.js"></script>
+        <script src="js/utils.js"></script>
+        <script src="js/data.js"></script>
+        <script src="js/ui-catalog.js"></script>
+        <script src="js/modules.js"></script>
+        <script src="js/project.js"></script>
+        <script src="js/catalog-forms.js"></script>
+        <script src="js/calculation.js"></script>
+        <script src="js/export.js"></script>
+        <script src="js/plano-corte.js"></script>
+        <script src="js/clients.js"></script>
+        <script src="js/events.js"></script>
+        <script src="js/main.js"></script>
         
         <!-- PWA Service Worker Registration -->
         <script>
